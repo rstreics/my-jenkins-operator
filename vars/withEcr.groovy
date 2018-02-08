@@ -15,8 +15,8 @@ def call(params = [:], Closure body) {
             withRegion(region).
             build().
             getAuthorizationToken(new GetAuthorizationTokenRequest()).
-            authorizationData[0]
-    def login = new String(auth.authorizationToken.decodeBase64()).tokenize(':')
+            authorizationData[0].authorizationToken.decodeBase64()
+    def login = new String(auth).tokenize(':')
 
     def returnStatus = sh(script: "docker login -u ${login[0]} -p ${login[1]} ${auth.proxyEndpoint}",
                           returnStatus:true)
