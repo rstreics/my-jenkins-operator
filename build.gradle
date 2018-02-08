@@ -13,7 +13,7 @@ sourceSets {
       srcDirs = ["src", "vars"]
     }
     resources {
-      srcDirs = ['resources']
+      srcDirs = ["resources"]
     }
   }
 }
