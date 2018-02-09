@@ -5,24 +5,13 @@ import com.amazonaws.services.ecr.model.*
 import com.amazonaws.services.ecr.*
 import com.amazonaws.regions.Regions
 
-def call(params = [:], arg, Closure body={}) {
-    def argv = [ region: Regions.currentRegion.name ]
-    if (arg instanceof Map) {
-        argv << arg
-    } else {
-        argv.region = arg
-    }
-    String region = argv.region
-
-
-
-
+def authenticate(region=Regions.currentRegion.name) {
     def data =  AmazonECRClientBuilder
-                    .standard()
-                    .withRegion(region)
-                    .build()
-                    .getAuthorizationToken(new GetAuthorizationTokenRequest())
-                    .authorizationData.first()
+            .standard()
+            .withRegion(region)
+            .build()
+            .getAuthorizationToken(new GetAuthorizationTokenRequest())
+            .authorizationData.first()
     if (!data) {
         error "I was not able to receive ecr auth data"
     }
@@ -45,7 +34,10 @@ def call(params = [:], arg, Closure body={}) {
             new File(filename).delete()
         }
     }
+}
 
+def call(region=Regions.currentRegion.name, Closure body={}) {
+    authenticate(region)
     if (body != null) {
       try {
         body()
