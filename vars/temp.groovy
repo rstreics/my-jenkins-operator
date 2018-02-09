@@ -1,4 +1,4 @@
-!/usr/bin/env groovy
+#!/usr/bin/env groovy
 
 import java.nio.file.*
 
