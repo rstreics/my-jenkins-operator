@@ -6,7 +6,7 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient
 
 
 
-def call(def deploymentName, def dockerImage, def namespace = 'automation-hub') {
+def call(def deploymentName, def dockerImage, def namespace = 'default') {
     def kubernetes = new DefaultKubernetesClient()
     def opts = kubernetes.
             extensions().

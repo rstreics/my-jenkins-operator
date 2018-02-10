@@ -2,6 +2,6 @@
 
 def call() {
   node('master') {
-    sh(script: 'git rev-parse HEAD', returnStdout: true).take(7)
+    sh(script: 'git rev-parse HEAD', returnStdout: true).trim().take(7)
   }
 }
