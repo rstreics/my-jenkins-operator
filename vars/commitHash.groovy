@@ -1,15 +1,15 @@
 #!/usr/bin/env groovy
 
-def short() {
+def shortHash() {
     sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
 }
 
-def long() {
+def longHash() {
     sh(script: 'git rev-parse --long HEAD', returnStdout: true).trim()
 }
 
 def call() {
   node('master') {
-    short()
+    return shortHash()
   }
 }
