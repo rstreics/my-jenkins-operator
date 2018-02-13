@@ -30,22 +30,25 @@ def file(Map kv = [:], arg="") {
     }
 
     def path = Paths.get( argv.path )
-    def directory = path.toString()
+    def directory = path
     def file = ""
     if ( !path.toFile().isDirectory() ) {
-        directory =  path.parent ? path.parent.toString() : pwd( tmp: true )
+        directory =  path.parent ?: Path.get( pwd( tmp: true ) )
         file = path.fileName.toString()
     }
 
-    def temp = Files.createTempFile(Paths.get(directory), file, argv.extension)
+    def temp = Files.createTempFile(directory, file, argv.extension)
     if (argv.deleteOnExit) {
         temp.toFile().deleteOnExit()
     }
 
     if ('absolute' == argv.kind) {
-        return temp.toAbsolutePath().toString()
+        temp = temp.toAbsolutePath()
+    } else if ('real' == argv.kind) {
+        temp = temp.toRealPath()
     }
-    return temp.toRealPath().toString()
+
+    return temp.toString()
 }
 
 def call(Map kv = [:], arg) {
