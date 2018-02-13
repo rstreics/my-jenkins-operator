@@ -40,6 +40,9 @@ def call(region=Regions.currentRegion.name, Closure body={}) {
     authenticate(region)
     if (body != null) {
       try {
+        def config = [:]
+        body.resolveStrategy = Closure.DELEGATE_FIRST
+        body.delegate = config
         body()
       } catch(Exception e) {
         error e
