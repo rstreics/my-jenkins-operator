@@ -3,35 +3,38 @@
 import java.nio.file.*
 
 def directory(String directory) {
-    return Files.createTempDirectory(directory).toAbsolutePath()
+    def argv = [ directory: pwd(),
+                 kind: 'absolute' ]
+    if (arg instanceof Map) {
+        argv << arg
+    } else {
+        argv.directory = arg
+    }
+
+    def dir = Files.createTempFile(argv.path, argv.extension)
+    if ('absolute' == argv.kind) {
+        return dir.toAbsolutePath().toString()
+    }
+    return dir.toRealPath().toString()
 }
 
 def file(Map kv = [:], arg) {
-    def argv = [ baseDir: pwd(),
-                 extension: '.tmp' ]
+    def argv = [ path: pwd(),
+                 extension: '.tmp',
+                 kind: 'absolute' ]
     if (arg instanceof Map) {
         argv << arg
     } else {
-        argv.directory = arg
+        argv.path = arg
     }
 
-    return Files.createTempFile(argv.directory, argv.extension).toAbsolutePath()
+    def temp = Files.createTempFile(argv.path, argv.extension)
+    if ('absolute' == argv.kind) {
+        return temp.toAbsolutePath().toString()
+    }
+    return temp.toRealPath().toString()
 }
 
 def call(Map kv = [:], arg) {
-    def argv = [ baseDir: pwd(),
-                 extension: '.tmp',
-                 tempDir:   null ]
-    if (arg instanceof Map) {
-        argv << arg
-    } else {
-        argv.directory = arg
-    }
-
-    if (argv.tempDir) {
-        def dir  = Paths.get(argv.baseDir, argv.tempDir)
-        argv.dir = directory( dir )
-    }
-
-    return file(argv)
+    return file(arg)
 }
