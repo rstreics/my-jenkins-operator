@@ -2,7 +2,7 @@
 
 import java.nio.file.*
 
-def directory(String directory) {
+def directory(String directory=null) {
     def argv = [ directory: pwd(),
                  kind: 'absolute' ]
     if (arg instanceof Map) {
@@ -18,10 +18,11 @@ def directory(String directory) {
     return dir.toRealPath().toString()
 }
 
-def file(Map kv = [:], arg) {
+def file(Map kv = [:], arg="") {
     def argv = [ path: pwd(temp: true),
                  extension: '.tmp',
-                 kind: 'absolute' ]
+                 kind: 'absolute',
+                 deleteOnExit: true]
     if (arg instanceof Map) {
         argv << arg
     } else {
@@ -29,17 +30,18 @@ def file(Map kv = [:], arg) {
     }
 
     def path = Paths.get( argv.path )
-    def directory
-    def file
-    if ( path.toFile().isDirectory() ) {
-        directory = path.toString()
-        file = ""
-    } else {
-        directory = path.parent.toString() ?: pwd( tmp: true )
+    def directory = path.toString()
+    def file = ""
+    if ( !path.toFile().isDirectory() ) {
+        directory =  path.parent ? path.parent.toString() : pwd( tmp: true )
         file = path.fileName.toString()
     }
 
-    def temp = Files.createTempFile(Paths.get(directory),  argv.path, argv.extension)
+    def temp = Files.createTempFile(Paths.get(directory), file, argv.extension)
+    if (argv.deleteOnExit) {
+        temp.toFile().deleteOnExit()
+    }
+
     if ('absolute' == argv.kind) {
         return temp.toAbsolutePath().toString()
     }
