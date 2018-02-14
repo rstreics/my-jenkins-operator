@@ -36,7 +36,7 @@ def authenticate(region=Regions.currentRegion.name) {
     }
 }
 
-def call(region=Regions.currentRegion.name, Closure body={}) {
+def call(region=Regions.currentRegion.name, Closure body=null) {
     authenticate(region)
     if (body != null) {
       try {
