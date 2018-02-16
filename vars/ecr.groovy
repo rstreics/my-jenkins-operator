@@ -5,6 +5,10 @@ import com.amazonaws.services.ecr.model.*
 import com.amazonaws.services.ecr.*
 import com.amazonaws.regions.Regions
 
+def login(region=Regions.currentRegion.name) {
+    authenticate(region)
+}
+
 def authenticate(region=Regions.currentRegion.name) {
     def data =  AmazonECRClientBuilder
             .standard()
