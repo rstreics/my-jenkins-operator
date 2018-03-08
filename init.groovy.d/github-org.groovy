@@ -37,7 +37,7 @@ def configs = client.
                 collect {
                   [ name:   it.metadata.name,
                     apiUrl: it.data.apiUrl ?: GitHubServerConfig.GITHUB_URL,
-                    manageHooks: [it.data.manageHooks, true].findResult {it != null},
+                    manageHooks: it.data.get('manageHooks', true),
                     username: it.data.username ?: it.data.organization,
                   ] + it.data
                 }
@@ -49,17 +49,17 @@ def storedCredentials = SystemCredentialsProvider.
                             [ (domain.name):  creds[0] ]
                           }
 
-github.configs << configs.collect {
-  def url       = new java.net.URI( it.apiUrl as String ).host
-  def creds     = storedCredentials[url] ?: credsProvider.createCredentials(it.apiUrl, it.deployment_key, it.name)
+github.configs += configs.collect {
+  def urlHost   = new java.net.URI( it.apiUrl as String ).host
+  def creds = storedCredentials[urlHost] ?: credsProvider.createCredentials(it.apiUrl, it.deployment_key, it.name)
   def server    = new GitHubServerConfig( creds.id )
   server.name   = it.name
-  server.apiUrl = it.api
+  server.apiUrl = it.apiUrl
   server.manageHooks = it.manageHooks
-  if (!github.hookSecretConfig &&
-       server.manageHooks &&
-       it.creds) {
-    github.hookSecretConfig = new HookSecretConfig( creds.id )
+  if (!github.hookSecretConfig && server.manageHooks) {
+      if (creds) {
+        github.hookSecretConfig = new HookSecretConfig( creds.id )
+      }
   }
   log.info "Added Github server ${server.name}: ${server.apiUrl}"
   server
@@ -95,7 +95,7 @@ configs
     gh.description = "${it.organization}, Github Organization"
     gh.navigators << nav
     gh.scheduleBuild(0, new BranchIndexingCause())
-    def registered = GitHubWebHook.get().reRegisterAllHooks();
   }
 
+GitHubWebHook.get().reRegisterAllHooks();
 Jenkins.instance.save()
