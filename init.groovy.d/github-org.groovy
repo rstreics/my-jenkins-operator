@@ -61,8 +61,11 @@ github.configs << configs.collect {
        it.creds) {
     github.hookSecretConfig = new HookSecretConfig( creds.id )
   }
- }
- github.save()
+  println "Added Github server ${name}: ${url}"
+  server
+}
+github.save()
+Jenkins.instance.save()
 
 def ofs = Jenkins.instance.getAllItems(OrganizationFolder)
 def existingOrgs = ofs.collect { it.name }
