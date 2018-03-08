@@ -61,7 +61,7 @@ github.configs << configs.collect {
        it.creds) {
     github.hookSecretConfig = new HookSecretConfig( creds.id )
   }
-  println "Added Github server ${name}: ${url}"
+  log.info "Added Github server ${server.name}: ${server.apiUrl}"
   server
 }
 github.save()
