@@ -22,9 +22,6 @@ if (!client.masterUrl || !client.namespace) {
   return
 }
 
-def github = GitHubPlugin.configuration()
-def serverNames = github.configs.collect{ it.name }
-def credsProvider = new GitHubTokenCredentialsCreator()
 def configs = client.
                 configMaps().
                 withLabels([
@@ -33,7 +30,6 @@ def configs = client.
                 ]).
                 list().
                 items.
-                grep { it.data && !(it.metadata.name in serverNames) }.
                 collect {
                   [ name:   it.metadata.name,
                     apiUrl: it.data.apiUrl ?: GitHubServerConfig.GITHUB_URL,
@@ -42,6 +38,7 @@ def configs = client.
                   ] + it.data
                 }
 
+def credsProvider = new GitHubTokenCredentialsCreator()
 def storedCredentials = SystemCredentialsProvider.
                           instance.
                           getDomainCredentialsMap().
@@ -49,7 +46,12 @@ def storedCredentials = SystemCredentialsProvider.
                             [ (domain.name):  creds[0] ]
                           }
 
-github.configs += configs.collect {
+def github = GitHubPlugin.configuration()
+
+def serverNames = github.configs.collect{ it.name }
+github.configs += configs
+                    .grep { !(it.name in serverNames) }
+                    .collect {
   def urlHost   = new java.net.URI( it.apiUrl as String ).host
   def creds = storedCredentials[urlHost] ?: credsProvider.createCredentials(it.apiUrl, it.deployment_key, it.name)
   def server    = new GitHubServerConfig( creds.id )
@@ -65,7 +67,6 @@ github.configs += configs.collect {
   server
 }
 github.save()
-Jenkins.instance.save()
 
 def ofs = Jenkins.instance.getAllItems(OrganizationFolder)
 def existingOrgs = ofs.collect { it.name }
@@ -87,6 +88,8 @@ configs
     )
     store.addCredentials(Domain.global(), userPass)
 
+    log.info "Apply Github org folder ${it.organization}"
+
     def nav = new GitHubSCMNavigator(it.apiUrl, it.organization, it.username, 'SAME')
     nav.includes = it.includes
     nav.excludes = it.excludes
@@ -99,3 +102,4 @@ configs
 
 GitHubWebHook.get().reRegisterAllHooks();
 Jenkins.instance.save()
+
