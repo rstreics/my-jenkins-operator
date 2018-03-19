@@ -58,10 +58,10 @@ def slackParameters = [
         slackTokenCredentialId:   'slack-token'
 ]
 
-Jenkins jenkins = Jenkins.getInstance()
+Jenkins jenk = Jenkins.getInstance()
 def domain = Domain.global()
-def store = jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
-def slack = jenkins.getExtensionList(jenkins.plugins.slack.SlackNotifier.DescriptorImpl.class)[0]
+def store = jenk.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
+def slack = jenk.getExtensionList(jenkins.plugins.slack.SlackNotifier.DescriptorImpl.class)[0]
 def secretText = new StringCredentialsImpl(
         CredentialsScope.GLOBAL,
         slackCredentialParameters.id,
@@ -76,4 +76,4 @@ slack.configure(request, formData)
 
 // save to disk
 slack.save()
-jenkins.save()
+jenk.save()
