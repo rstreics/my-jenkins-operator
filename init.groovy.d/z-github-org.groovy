@@ -53,32 +53,33 @@ github.configs += configs
                     .grep { !(it.name in serverNames) }
                     .collect {
   def urlHost   = new java.net.URI( it.apiUrl as String ).host
-  def creds = storedCredentials[urlHost] ?: credsProvider.createCredentials(it.apiUrl, it.deployment_key, it.name)
+  def creds     = storedCredentials[urlHost] ?: credsProvider.createCredentials(it.apiUrl, it.deployment_key, it.name)
   def server    = new GitHubServerConfig( creds.id )
   server.name   = it.name
   server.apiUrl = it.apiUrl
   server.manageHooks = it.manageHooks
-  if (!github.hookSecretConfig && server.manageHooks) {
-      if (creds) {
-        github.hookSecretConfig = new HookSecretConfig( creds.id )
-      }
+  if (!github.hookSecretConfig
+    && server.manageHooks
+    && creds) {
+    github.hookSecretConfig = new HookSecretConfig( creds.id )
   }
   log.info "Added Github server ${server.name}: ${server.apiUrl}"
   server
 }
 github.save()
 
-def ofs = Jenkins.instance.getAllItems(OrganizationFolder)
-def existingOrgs = ofs.collect { it.name }
-
 def store = Jenkins
               .instance
               .getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0]
               .store
 
+def existingCreds = SystemCredentialsProvider
+                      .instance
+                      .getDomainCredentialsMap()[ (Domain.global()) ]
+                      .collect { it.id }
 configs
-  .grep { it.organization }
-  .grep { !(it.organization in existingOrgs) }
+  .grep { it.username && it.deployment_key }
+  .grep { !(it.username in existingCreds) }
   .each {
     def userPass = new UsernamePasswordCredentialsImpl(
       CredentialsScope.GLOBAL,
@@ -86,8 +87,17 @@ configs
       it.username,
       it.deployment_key
     )
+    log.info "Store Github credentials ${it.username}"
     store.addCredentials(Domain.global(), userPass)
+  }
 
+
+def ofs = Jenkins.instance.getAllItems(OrganizationFolder)
+def existingOrgs = ofs.collect { it.name }
+configs
+  .grep { it.organization }
+  .grep { !(it.organization in existingOrgs) }
+  .each {
     log.info "Apply Github org folder ${it.organization}"
 
     def nav = new GitHubSCMNavigator(it.apiUrl, it.organization, it.username, 'SAME')
