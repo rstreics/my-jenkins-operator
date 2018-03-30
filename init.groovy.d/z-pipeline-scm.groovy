@@ -21,7 +21,7 @@ if (client.masterUrl && client.namespace) {
     configMaps().
     withLabels([
       'project': 'jenkins',
-      'qualifier': 'scm-config'
+      'qualifier': 'pipeline-scm'
     ]).
     list().
     items.
