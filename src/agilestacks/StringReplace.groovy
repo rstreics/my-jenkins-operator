@@ -5,8 +5,8 @@ import java.util.logging.Logger
 
 class StringReplace implements Serializable {
 
-    final CURLY = /\$\{([\w\.\-\_]+)\}/
-    final MUSTACHE = /\{\{([\w\.\-\_]+)\}\}/
+    final CURLY = /\$\{\s*([\w\.\-\_]+)\s*\}/
+    final MUSTACHE = /\{\{\s*([\w\.\-\_]+)\s*\}\}/
     final log = Logger.getLogger(this.class.name)
 
     def render(text, params=[:], pattern=CURLY) {
