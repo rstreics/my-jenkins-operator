@@ -12,34 +12,35 @@ import java.util.logging.Logger
 def log = Logger.getLogger(this.class.name)
 def store = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
 def domain = Domain.global()
-def allCreds = store.getCredentials(domain)
+
+def globalCreds = SystemCredentialsProvider
+                       .instance
+                       .getDomainCredentialsMap()[ (domain) ]
+                       .collectEntries { [ (it.id):  it ] }
 
 def client = new DefaultKubernetesClient(new ConfigBuilder().build())
-if (client.masterUrl && client.namespace) {
-  client.
-    secrets().
-    withLabels([
-      'project': 'jenkins',
-      'qualifier': 'credentials'
-    ]).
-    list().
-    items.
-    grep { it.data }.
-    each { secret ->
-      secret.data.keys.
-        grep { credId -> allCreds.find{secret.id == credId} == null }.
-        each { credId ->
-          def val = secret.data[credId]
-          // def creds = new StringCredentialsImpl(
-          //                   CredentialsScope.GLOBAL,
-          //                   credId,
-          //                   credId,
-          //                   new hudson.util.Secret( value ))
-          def userPass = new UsernamePasswordCredentialsImpl(
-                                CredentialsScope.GLOBAL, key, "", key, val )
-          store.addCredentials(domain, userPass)
-          store.addCredentials(domain, creds)
-        }
-    }
+if (!client.masterUrl || !client.namespace) {
+  return
 }
+
+client
+  .secrets()
+  .withLabels([
+    'project': 'jenkins',
+    'qualifier': 'credentials'
+  ])
+  .list()
+  .items
+  .grep { it.data }
+  .collect { it.data }
+  .each {
+    it.grep { !globalCreds.containsKey( it.key ) }
+      .collect {
+        def user = it.key
+        def pass = new String(it.value.decodeBase64())
+        new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, user, "", user, pass)
+      }.each {
+        store.addCredentials(domain, it)
+      }
+  }
 
