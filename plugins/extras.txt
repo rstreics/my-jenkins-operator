@@ -1,1 +1,2 @@
 slack:2.3
+credentials-binding:1.16
