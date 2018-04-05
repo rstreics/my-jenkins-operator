@@ -96,17 +96,6 @@ toolbox.envVars         = [ new ContainerEnvVar('BACKEND_BUCKET_NAME', configVar
                             new ContainerEnvVar('DOCKER_DAEMON_ARGS', "-D ${DOCKER_ARGS}"),
                             new ContainerEnvVar('AWS_REGION', configVars.AWS_REGION) ]
 
-def kctl             = new ContainerTemplate('kubectl', 'docker.io/agilestacks/kubectl:1.6.1')
-kctl.command         = 'cat'
-kctl.ttyEnabled      = true
-kctl.alwaysPullImage = true
-
-def dind             = new ContainerTemplate('dind', 'docker.io/docker:dind')
-dind.command         = 'dockerd ${DOCKER_ARGS}'
-dind.ttyEnabled      = true
-dind.privileged      = true
-dind.alwaysPullImage = true
-
 def pod1         = new PodTemplate()
 pod1.name        = 'default'
 pod1.label       = pod1.name
@@ -135,23 +124,6 @@ pod2.volumes     = [
   new HostPathVolume("/var/run/docker.sock", "/var/run/docker.sock"),
   new EmptyDirVolume('/var/lib/docker', false),
 ]
-
-def pod3         = new PodTemplate()
-pod3.name        = 'agilestacks'
-pod3.label       = pod3.name
-pod3.namespace   = client.namespace
-pod3.inheritFrom = pod1.name
-pod3.containers  = [ kctl, dind ]
-pod3.volumes     = [
-  // new EmptyDirVolume('/home/jenkins', false),
-  new PersistentVolumeClaim('/home/jenkins/workspace', 'workspace-volume', false),
-  new HostPathVolume("/var/run/docker.sock", "/var/run/docker.sock"),
-  new EmptyDirVolume('/var/lib/docker', false),
-]
-def pod2and3 = PodTemplateUtils.combine(pod2, pod3)
-kube.templates  = [ pod1, pod2, pod2and3 ]
-
-// kube.templates = [pod1, pod2]
 
 jenk.clouds << kube
 jenk.save()
