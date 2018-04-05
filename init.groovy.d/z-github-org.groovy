@@ -34,12 +34,16 @@ def configs = client.
                   [ name:   it.metadata.name,
                     apiUrl: it.data.apiUrl ?: GitHubServerConfig.GITHUB_URL,
                     manageHooks: it.data.get('manageHooks', true),
-                    username: it.data.username ?: it.data.organization,
                   ] + it.data
                 }
 
 def credsProvider = new GitHubTokenCredentialsCreator()
-def storedCredentials = SystemCredentialsProvider.
+def globalCreds = SystemCredentialsProvider
+                       .instance
+                       .getDomainCredentialsMap()[ (Domain.global()) ]
+                       .collectEntries { [ (it.id):  it ] }
+
+def domainCreds = SystemCredentialsProvider.
                           instance.
                           getDomainCredentialsMap().
                           collectEntries { domain, creds ->
@@ -52,8 +56,13 @@ def serverNames = github.configs.collect{ it.name }
 github.configs += configs
                     .grep { !(it.name in serverNames) }
                     .collect {
+  def creds  = domainCreds[urlHost]
+  if (!creds) {
+    def accessToken = globalCreds[ it.credentialsId ].password
+    creds = credsProvider.createCredentials(it.apiUrl, accessToken, it.name)
+  }
+
   def urlHost   = new java.net.URI( it.apiUrl as String ).host
-  def creds     = storedCredentials[urlHost] ?: credsProvider.createCredentials(it.apiUrl, it.deployment_key, it.name)
   def server    = new GitHubServerConfig( creds.id )
   server.name   = it.name
   server.apiUrl = it.apiUrl
@@ -68,30 +77,6 @@ github.configs += configs
 }
 github.save()
 
-def store = Jenkins
-              .instance
-              .getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0]
-              .store
-
-def existingCreds = SystemCredentialsProvider
-                      .instance
-                      .getDomainCredentialsMap()[ (Domain.global()) ]
-                      .collect { it.id }
-configs
-  .grep { it.username && it.deployment_key }
-  .grep { !(it.username in existingCreds) }
-  .each {
-    def userPass = new UsernamePasswordCredentialsImpl(
-      CredentialsScope.GLOBAL,
-      it.username, "Github ${it.organization} deployment key",
-      it.username,
-      it.deployment_key
-    )
-    log.info "Store Github credentials ${it.username}"
-    store.addCredentials(Domain.global(), userPass)
-  }
-
-
 def ofs = Jenkins.instance.getAllItems(OrganizationFolder)
 def existingOrgs = ofs.collect { it.name }
 configs
@@ -100,7 +85,7 @@ configs
   .each {
     log.info "Apply Github org folder ${it.organization}"
 
-    def nav = new GitHubSCMNavigator(it.apiUrl, it.organization, it.username, 'SAME')
+    def nav = new GitHubSCMNavigator(it.apiUrl, it.organization, it.credentialsId, 'SAME')
     nav.includes = it.includes
     nav.excludes = it.excludes
 
