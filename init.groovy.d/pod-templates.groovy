@@ -124,7 +124,7 @@ pod2.volumes     = [
   new HostPathVolume("/var/run/docker.sock", "/var/run/docker.sock"),
   new EmptyDirVolume('/var/lib/docker', false),
 ]
-
+kube.templates  = [ pod1, pod2 ]
 jenk.clouds << kube
 jenk.save()
 log.info '"kubernetes" cloud has been configured successfully'
