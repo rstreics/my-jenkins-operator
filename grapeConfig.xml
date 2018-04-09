@@ -12,6 +12,7 @@
       <ibiblio name="m.g.o-public" root="https://repo.jenkins-ci.org/public/" m2compatible="true" />
       <ibiblio name="java.net2" root="http://download.java.net/maven/2/" m2compatible="true"/>
       <ibiblio name="codehaus" root="http://repository.codehaus.org/" m2compatible="true"/>
+      <ibiblio name="mirror" root="http://mirrors.ibiblio.org/maven2/" m2compatible="true"/>
     </chain>
   </resolvers>
 </ivysettings>
