@@ -59,7 +59,8 @@ github.configs += configs
   def urlHost   = new java.net.URI( it.apiUrl as String ).host
   def creds  = domainCreds[urlHost]
   if (!creds) {
-    def accessToken = globalCreds[ it.credentialsId ].password
+    def secret = globalCreds[ it.credentialsId ].password
+    def accessToken = hudson.util.Secret.toString( secret )
     creds = credsProvider.createCredentials(it.apiUrl, accessToken, it.name)
   }
   def server    = new GitHubServerConfig( creds.id )
