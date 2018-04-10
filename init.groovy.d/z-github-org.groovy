@@ -56,13 +56,12 @@ def serverNames = github.configs.collect{ it.name }
 github.configs += configs
                     .grep { !(it.name in serverNames) }
                     .collect {
+  def urlHost   = new java.net.URI( it.apiUrl as String ).host
   def creds  = domainCreds[urlHost]
   if (!creds) {
     def accessToken = globalCreds[ it.credentialsId ].password
     creds = credsProvider.createCredentials(it.apiUrl, accessToken, it.name)
   }
-
-  def urlHost   = new java.net.URI( it.apiUrl as String ).host
   def server    = new GitHubServerConfig( creds.id )
   server.name   = it.name
   server.apiUrl = it.apiUrl
