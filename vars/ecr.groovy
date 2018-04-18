@@ -11,6 +11,10 @@ def login(region=Regions.currentRegion.name) {
     authenticate(region)
 }
 
+boolean interactive() {
+    sh(script: '[[ $- == *i* ]]', returnStatus:true) == 0
+}
+
 def authenticate(region=Regions.currentRegion.name) {
     def data =  AmazonECRClientBuilder
             .standard()
@@ -24,21 +28,28 @@ def authenticate(region=Regions.currentRegion.name) {
     def server = data.proxyEndpoint
     def token = data.authorizationToken.decodeBase64()
     def login = new String(token).tokenize(':')
-    def tempDir = pwd(tmp: true)
-    def uuid = UUID.randomUUID().toString().replace("-", "").take(5)
-    def filename = "${tempDir}/ecr${uuid}.tmp"
 
-    dir( tempDir ) {
-        try {
-            writeFile(text: login.last(), file: filename)
-            def returnStatus = sh(script: "cat ${filename} | docker login --username ${login.first()} --password-stdin ${server}",
-                    returnStatus: true)
-            if (returnStatus != 0) {
-                error "I was not able to login to ECR {auth.proxyEndpoint}"
+    if (interactive()) {
+        def tempDir = pwd(tmp: true)
+        def uuid = UUID.randomUUID().toString().replace("-", "").take(5)
+        def filename = "${tempDir}/ecr${uuid}.tmp"
+
+        dir( tempDir ) {
+            try {
+                writeFile(text: login.last(), file: filename)
+                def returnStatus = sh(
+                        script: "cat ${filename} | docker login --username ${login.first()} --password-stdin ${server}",
+                        returnStatus: true)
+                if (returnStatus != 0) {
+                    error "I was not able to login to ECR {auth.proxyEndpoint}"
+                }
+            } finally {
+                new File(filename).delete()
             }
-        } finally {
-            new File(filename).delete()
         }
+    } else {
+        echo 'Running docker login for non-interractive shell'
+        sh "docker login --username ${login.first()} --password ${login.last()} ${server}"
     }
 }
 
