@@ -1,5 +1,5 @@
 #!/usr/bin/env groovy
-package agilestacks
+package com.agilestacks.jenkins.share
 
 import groovy.util.ConfigSlurper
 import java.util.Properties

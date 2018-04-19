@@ -33,3 +33,6 @@
 /target
 out
 .idea
+.gradle
+build
+jenkins.iml

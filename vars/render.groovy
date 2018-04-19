@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
-import agilestacks.StringReplace
-import agilestacks.GroovyTemplate
+import com.agilestacks.jenkins.share.StringReplace
+import com.agilestacks.jenkins.share.GroovyTemplate
 
 def curly(String text, Map args=[:]) {
     return new StringReplace().curly(text, args)

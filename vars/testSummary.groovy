@@ -1,7 +1,9 @@
 #!/usr/bin/env groovy
-@Grab(group='org.jenkins-ci.plugins', module='junit', version='1.21')
+
+@GrabResolver(name='releases', root='http://repo.jenkins-ci.org/releases/')
 @Grab(group='org.jenkins-ci.plugins.workflow', module='workflow-support', version='2.14')
 import org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper
+@Grab(group='org.jenkins-ci.plugins', module='junit', version='1.21')
 import hudson.tasks.test.AbstractTestResultAction
 
 def call(RunWrapper currentBuild) {
