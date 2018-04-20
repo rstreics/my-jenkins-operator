@@ -17,7 +17,7 @@ class PipelineSpec extends Specification {
                 .expect()
                 .get()
                 .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
-                .andReturn(200, testCrdListWithPipeline() ).always()
+                .andReturn(200, singlePipelineCrdList() ).always()
 
         expect:
             def result = client.customResourceDefinitions().list()
@@ -26,11 +26,18 @@ class PipelineSpec extends Specification {
 
     def "pipeline controller creates new CRD if needed"() {
         given:
-        server \
-                .expect()
+        server.expect()
                 .get()
                 .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
-                .andReturn(200, emptyCrdList() ).always()
+                .andReturn(200, emptyCrdList() ).once()
+        server.expect()
+                .post()
+                .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
+                .andReturn(201, null).once()
+        server.expect()
+                .get()
+                .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
+                .andReturn(200, singlePipelineCrdList() ).once()
         when:
         controller.registerCrd()
 
@@ -39,7 +46,7 @@ class PipelineSpec extends Specification {
         1 == result.items.size()
     }
 
-    def testCrdListWithPipeline() {
+    def singlePipelineCrdList() {
         new CustomResourceDefinitionListBuilder()
                 .addNewItem()
                 .withNewMetadata()

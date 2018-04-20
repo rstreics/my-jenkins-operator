@@ -43,7 +43,7 @@ class PipelineController {
                                 .url(crdOps.resourceUrl)
                                 .build()
         def resp = crdOps.client.newCall(request).execute()
-        log.debug("Response: [${resp.toString()}]")
+        log.finest("Response: [${resp.toString()}]")
         def code = resp.code()
         if (code < 200 || code > 300) {
             throw new RuntimeException("Unable to create CRD [resp: ${resp.code()}, ${resp.body().string()}] ")
