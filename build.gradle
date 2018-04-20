@@ -4,27 +4,72 @@ version '1.0-SNAPSHOT'
 apply plugin: 'idea'
 apply plugin: 'groovy'
 apply plugin: 'java'
+apply plugin: 'application'
 
-sourceCompatibility = 1.8
+
+ext {
+    groovyVersion = '2.4.15'
+}
+
+configurations {
+    ivy
+}
+
+sourceCompatibility = 1.9
+
+mainClassName = 'com.agilestacks.jenkins.operator.Main'
 
 sourceSets {
-  main {
-    java {
-      srcDirs = ["src", "vars", "init.groovy.d"]
+    main {
+        java {
+            srcDirs = ["src"]
+        }
+        groovy {
+            srcDirs = ["src"]
+        }
+        resources {
+            srcDirs = ["resources"]
+        }
     }
-    resources {
-      srcDirs = ["resources"]
+    test {
+        java {
+            srcDirs = ['test']
+        }
+        groovy {
+            srcDirs = ['test']
+        }
+        resources {
+            srcDirs = ['test-resources']
+        }
     }
-  }
 }
 
 repositories {
     mavenCentral()
+    maven { url 'http://repo.jenkins-ci.org/releases/' }
+    maven { url 'http://repo.jenkins-ci.org/public/' }
+}
+dependencies {
+    ivy "org.apache.ivy:ivy:2.4.0"
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    compile 'io.fabric8:kubernetes-client:3.1.10'
+    compile 'commons-cli:commons-cli:1.2'
+    compile 'org.jenkins-ci.main:jenkins-core:2.117'
+    compile 'org.csanchez.jenkins.plugins:kubernetes:1.5.2'
+    compile 'javax.servlet:servlet-api:2.5'
+    compile 'com.github.docker-java:docker-java:3.0.14'
+    compile 'io.sundr:sundr-annotations:0.0.25'
+
+    // compile 'com.amazonaws:aws-java-sdk:1.11.313'
+    // compile 'org.jenkins-ci.plugins:junit:1.21'
+
+    // compile 'org.apache.ivy:ivy:2.4.0'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+    testCompile 'io.fabric8:kubernetes-server-mock:3.1.10'
 }
 
-dependencies {
-    compile group: 'io.fabric8', name: 'kubernetes-client', version = '2.6.1'
-    compile group: 'org.apache.ivy', name: 'ivy', version: '2.3.0'
-    compile 'org.codehaus.groovy:groovy-all:2.3.11'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+tasks.withType(GroovyCompile) {
+    groovyClasspath += configurations.ivy
 }
