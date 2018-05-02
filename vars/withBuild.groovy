@@ -41,7 +41,7 @@ def backToNormal(Closure body=null) {
     }
 }
 
-def becameFailure(Closure body=null) {
+def becomeFailure(Closure body=null) {
     Run build = $build()
     def result = build?.result ?: Result.SUCCESS
     if (result.isWorseOrEqualTo(Result.FAILURE)) {
@@ -52,7 +52,7 @@ def becameFailure(Closure body=null) {
     }
 }
 
-def becameUnstable(Closure body=null) {
+def becomeUnstable(Closure body=null) {
     Run build = $build()
     def result = build?.result ?: Result.SUCCESS
     if (result == Result.UNSTABLE) {
@@ -64,15 +64,6 @@ def becameUnstable(Closure body=null) {
 }
 
 def call(Closure body=null) {
-//    Run build = $build()
-//    build.properties.each { k,v->
-//        echo "${k} = ${v}"
-//    }
-//
-//    echo build.allActions.toString()
-//    build.allActions.each {
-//        echo "Action: ${it.class.name}: ${it}"
-//    }
     if (body != null) {
         def config = [:]
         body.resolveStrategy = Closure.DELEGATE_FIRST
