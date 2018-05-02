@@ -4,6 +4,7 @@
 // @Grab(group='org.jenkins-ci.plugins.workflow', module='workflow-support', version='2.13')
 import hudson.model.Result
 import hudson.model.Run
+//import org.jenkinsci.plugins.workflow.job.WorkflowRun
 
 def success(Closure body=null) {
     Run build = $build()
@@ -63,6 +64,15 @@ def becameUnstable(Closure body=null) {
 }
 
 def call(Closure body=null) {
+//    Run build = $build()
+//    build.properties.each { k,v->
+//        echo "${k} = ${v}"
+//    }
+//
+//    echo build.allActions.toString()
+//    build.allActions.each {
+//        echo "Action: ${it.class.name}: ${it}"
+//    }
     if (body != null) {
         def config = [:]
         body.resolveStrategy = Closure.DELEGATE_FIRST

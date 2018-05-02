@@ -6,7 +6,8 @@ import org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper
 @Grab(group='org.jenkins-ci.plugins', module='junit', version='1.21')
 import hudson.tasks.test.AbstractTestResultAction
 
-def call(RunWrapper currentBuild) {
+def call() {
+    def currentBuild = new RunWrapper($build(), true)
     def testResultAction = currentBuild?.rawBuild?.getAction(AbstractTestResultAction.class)
 
     if (testResultAction != null) {
