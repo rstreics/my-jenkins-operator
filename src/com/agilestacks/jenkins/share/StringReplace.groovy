@@ -9,7 +9,7 @@ class StringReplace implements Serializable {
     final MUSTACHE = /\{\{\s*([\w\.\-\_]+)\s*\}\}/
     final log = Logger.getLogger(this.class.name)
 
-    def render(text, params=[:], pattern=CURLY) {
+    String render(text, params=[:], pattern=CURLY) {
         text.replaceAll(pattern) { m, i ->
             if (m.class in Collection || m.class.array) {
                 return params[ m[1] ] ?: m[0]
@@ -18,11 +18,11 @@ class StringReplace implements Serializable {
         }
     }
 
-    def curly(text, params=[:]) {
+    String curly(String text,  def params=[:]) {
         render(text, params, CURLY)
     }
 
-    def mustache(text, params=[:]) {
+    String mustache(String text, def params=[:]) {
         render(text, params, MUSTACHE)
     }
 }
