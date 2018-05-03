@@ -86,6 +86,7 @@ jnlp.alwaysPullImage = true
 
 def toolbox             = new ContainerTemplate('toolbox', 'docker.io/agilestacks/toolbox:stable')
 toolbox.command         = 'cat'
+toolbox.args            = ''
 toolbox.ttyEnabled      = true
 toolbox.privileged      = true
 toolbox.alwaysPullImage = true
