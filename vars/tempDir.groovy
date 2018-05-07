@@ -1,17 +1,29 @@
 #!/usr/bin/env groovy
 
-import java.nio.file.*
+import java.nio.file.Files
 
-def call(String path) {
-    return call(path: path)
+def call(String name, Closure body=null) {
+    return call(prefix: name, body)
 }
 
-def call(Map arg=[:], Closure body=null) {
-    def argv = [ directory: pwd(tmp: true),
+def call(def arg=[:], Closure body=null) {
+    def argv = [ prefix: '',
+                 directory: pwd(tmp: true),
                  kind: 'absolute',
-                 deleteOnExit: false ] << arg.findAll{it.value != null}
+                 deleteOnExit: true, ]
 
-    def dir = Files.createTempFile(argv.path, argv.extension)
+    if (arg instanceof Map) {
+        argv << arg.findAll{it.value != null}
+    } else {
+        argv.prefix = arg?.toString()
+    }
+
+    def parent = new File( argv.directory as String).toPath()
+    if ( Files.notExists(parent) ){
+        parent.toFile().mkdirs()
+    }
+
+    def dir = Files.createTempDirectory(parent, argv.prefix as String)
     def result
     if ('absolute' == argv.kind) {
         result =  dir.toAbsolutePath().toString()
@@ -28,8 +40,8 @@ def call(Map arg=[:], Closure body=null) {
                 body.resolveStrategy = Closure.DELEGATE_FIRST
                 body.delegate = config
                 body()
-            } catch (Exception e) {
-                error e
+            } catch (all) {
+                error all?.message ?: all.toString()
             }
 
             if (argv.deleteOnExit) {
