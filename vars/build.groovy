@@ -57,7 +57,7 @@ boolean isBecomeUnstable() {
     return false
 }
 
-void setAppenDescription(String text) {
+void setAppendDescription(String text) {
     if (!text) {
         return
     }
@@ -80,6 +80,15 @@ void setDescription(String text) {
 String getDescription() {
     Run build = $build()
     return build.description ?: ''
+}
+
+def leftShift(String text) {
+    def result = Result.fromString(text)
+    if (result) {
+        Run build = $build()
+        build.result = result
+    }
+    this.appendDescription = text
 }
 
 def call() {
