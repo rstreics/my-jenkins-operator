@@ -7,16 +7,7 @@ List<String> findFiles(args=[:]) {
             includes: '**/*',
             excludes: null
     ] << args
-
-    def ant = new AntBuilder()
-    def scanner = ant.fileScanner {
-        fileset(argv)
-    }
-    def fls = []
-    for (f in scanner) {
-        fls << f.getAbsolutePath()
-    }
-    return fls
+    return new FileNameFinder().getFileNames(argv)
 }
 
 List<String> findDirs(args=[:]) {
