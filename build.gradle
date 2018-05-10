@@ -5,7 +5,8 @@ apply plugin: 'idea'
 apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'application'
-
+apply plugin: 'java-library'
+apply plugin: 'maven'
 
 ext {
     groovyVersion = '2.4.15'
@@ -25,7 +26,7 @@ sourceSets {
             srcDirs = ["src"]
         }
         groovy {
-            srcDirs = ["src"]
+            srcDirs = ["src", "vars"]
         }
         resources {
             srcDirs = ["resources"]
@@ -46,28 +47,43 @@ sourceSets {
 
 repositories {
     mavenCentral()
-    maven { url 'http://repo.jenkins-ci.org/releases/' }
-    maven { url 'http://repo.jenkins-ci.org/public/' }
+    maven {
+        url 'http://repo.jenkins-ci.org/releases/'
+        metadataSources {
+            mavenPom()
+            artifact()
+        }
+    }
+    maven {
+        url 'http://repo.jenkins-ci.org/public/'
+        metadataSources {
+            mavenPom()
+            artifact()
+        }
+    }
+    maven { url 'http://repo.spring.io/plugins-release/' }
+    maven { url 'http://repo.spring.io/libs-milestone/' }
 }
 dependencies {
     ivy "org.apache.ivy:ivy:2.4.0"
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
     compile 'io.fabric8:kubernetes-client:3.1.10'
     compile 'commons-cli:commons-cli:1.2'
-    compile 'org.jenkins-ci.main:jenkins-core:2.117'
-    compile 'org.csanchez.jenkins.plugins:kubernetes:1.5.2'
-    compile 'javax.servlet:servlet-api:2.5'
-    compile 'com.github.docker-java:docker-java:3.0.14'
     compile 'io.sundr:sundr-annotations:0.0.25'
+    compileOnly 'org.jenkins-ci.main:jenkins-core:2.117'
+    compileOnly 'org.csanchez.jenkins.plugins:kubernetes:1.5.2'
+    compileOnly 'javax.servlet:servlet-api:2.5'
+    compileOnly 'com.github.docker-java:docker-java:3.0.14'
+    compileOnly 'com.offbytwo.jenkins:jenkins-client:0.3.7'
+    compileOnly 'org.jenkins-ci.plugins:cloudbees-folder:6.4'
+    compileOnly 'org.jenkins-ci.plugins:git:3.6.0'
+    compileOnly 'org.jenkins-ci.plugins.workflow:workflow-job:2.13'
+    compileOnly 'org.jenkins-ci.plugins.workflow:workflow-cps:2.41'
 
-    // compile 'com.amazonaws:aws-java-sdk:1.11.313'
-    // compile 'org.jenkins-ci.plugins:junit:1.21'
-
-    // compile 'org.apache.ivy:ivy:2.4.0'
-
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'junit:junit:4.12'
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile 'io.fabric8:kubernetes-server-mock:3.1.10'
+    testCompile 'com.squareup.okhttp3:mockwebserver:3.10.0'
 }
 
 tasks.withType(GroovyCompile) {
