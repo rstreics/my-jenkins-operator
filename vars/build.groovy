@@ -88,7 +88,7 @@ def leftShift(String text) {
         Run build = $build()
         build.result = result
     }
-    this.appendDescription = text
+    setAppendDescription( text )
 }
 
 def call() {
