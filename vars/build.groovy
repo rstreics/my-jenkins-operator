@@ -63,7 +63,7 @@ void setAppendDescription(String text) {
     }
 
     Run build = $build()
-    def lines = this.description.
+    def lines = getDescription().
             replaceAll('\n', ';').
             split(';').
             collect{it.trim()}.
@@ -83,9 +83,9 @@ String getDescription() {
 }
 
 def leftShift(String text) {
+    Run build = $build()
     def result = Result.fromString(text)
     if (result) {
-        Run build = $build()
         build.result = result
     }
     setAppendDescription( text )
