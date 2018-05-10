@@ -5,6 +5,7 @@ import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider
 
 def call(String arn = null) {
     def creds = new STSAssumeRoleSessionCredentialsProvider.Builder(arn, "jenkins-deployer")
+            .build()
             .getCredentials()
 
     return [
