@@ -5,6 +5,9 @@
  */
 //@GrabResolver(name='releases', root='http://repo.jenkins-ci.org/releases/')
 //@Grab(group='org.jenkins-ci.plugins.workflow', module='workflow-support', version='2.13')
+//@Grab(group='org.jenkins-ci.plugins.workflow', module='workflow-support', version='2.14')
+//@Grab(group='org.jenkins-ci.plugins', module='junit', version='1.21')
+import hudson.tasks.test.AbstractTestResultAction
 import hudson.model.Result
 import hudson.model.Run
 import org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper
@@ -57,29 +60,35 @@ boolean isBecomeUnstable() {
     return false
 }
 
+def appendDescription(String text) {
+    setAppendDescription(text)
+    return getDescription()
+}
+
 void setAppendDescription(String text) {
     if (!text) {
         return
     }
 
-    Run build = $build()
-    def lines = getDescription().
-            replaceAll('\n', ';').
-            split(';').
-            collect{it.trim()}.
-            grep{it}
-    lines << text
-    build.description = lines.join('; ')
+    String oneline = getDescription().replaceAll('\n',';')
+    List lines = oneline.split(';').collect{it?.trim()}.grep{it}
+    lines.add(text)
+
+    setDescription( lines.join('; ') )
 }
 
 void setDescription(String text) {
     Run build = $build()
-    build.description = text
+    build.setDescription(text)
 }
 
 String getDescription() {
     Run build = $build()
     return build.description ?: ''
+}
+
+def leftShift(Exception err) {
+    leftShift(err.message ?: err.toString())
 }
 
 def leftShift(String text) {
@@ -91,6 +100,24 @@ def leftShift(String text) {
     setAppendDescription( text )
 }
 
+def testSummary(args = [:]) {
+    def argv = [pretty: false] << args
+
+    Run build = $build()
+    def testResultAction = build.getAction(AbstractTestResultAction)
+
+    if (testResultAction != null) {
+        def total = testResultAction?.getTotalCount() ?: 0
+        def failed = testResultAction?.getFailCount() ?: 0
+        def skipped = testResultAction?.getSkipCount() ?: 0
+        def passed = total - failed - skipped
+
+        return "Passed: ${passed}, Failed: ${failed}, Skipped ${skipped}"
+    }
+    return argv?.pretty ? "No tests found" : null
+}
+
+
 def call() {
-    new RunWrapper($build())
+    new RunWrapper($build(), true)
 }
