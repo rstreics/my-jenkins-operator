@@ -1,3 +1,8 @@
+//import hudson.Util
+
+
+import hudson.Util
+
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -7,7 +12,11 @@ List<String> findFiles(args=[:]) {
             includes: '**/*',
             excludes: null
     ] << args
-    return new FileNameFinder().getFileNames(argv)
+    return Util.
+            createFileSet(new File(argv.dir as String), argv.includes, argv.excludes).
+            directoryScanner.
+            includedFiles
+//    return new FileNameFinder().getFileNames(argv)
 }
 
 List<String> findDirs(args=[:]) {
