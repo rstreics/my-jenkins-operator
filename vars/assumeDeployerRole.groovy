@@ -1,4 +1,6 @@
-#!/usr/bin/env groovy @GrabResolver(name='central', root='http://central.maven.org/maven2/') @GrabResolver(name = 'central', root = 'http://central.maven.org/maven2/')
+#!/usr/bin/env groovy
+
+@GrabResolver(name = 'central', root = 'http://central.maven.org/maven2/')
 @Grab(group = 'com.amazonaws', module = 'aws-java-sdk', version = '1.11.313')
 @Grab(group = 'software.amazon.ion', module = 'ion-java', version = '1.0.2')
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider
