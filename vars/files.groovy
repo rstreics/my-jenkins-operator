@@ -23,7 +23,7 @@ List<String> findDirs(args=[:]) {
     def files = findFiles(args)
     def dirs =  files.collect{
         new File(it).absoluteFile?.parent
-    }.unique().grep(it && it != '/')
+    }.unique().grep{it && it != '/'}
     return dirs
 }
 
