@@ -1,5 +1,4 @@
-//import hudson.Util
-
+#!/usr/bin/env groovy
 
 import hudson.Util
 
@@ -12,21 +11,20 @@ List<String> findFiles(args=[:]) {
             includes: '**/*',
             excludes: null
     ] << args
+    def basedir = new File(argv.dir as String)
     return Util.
-            createFileSet(new File(argv.dir as String), argv.includes, argv.excludes).
+            createFileSet(basedir, argv.includes, argv.excludes).
             directoryScanner.
-            includedFiles
-//    return new FileNameFinder().getFileNames(argv)
+            includedFiles.
+            collect {new File(it).absolutePath}.toList()
 }
 
 List<String> findDirs(args=[:]) {
-    return findFiles(args).collect{
-        def f = new File(it)
-        if (f.file) {
-            f = f.parentFile
-        }
-        f?.absolutePath
-    }.grep{it}.unique()
+    def files = findFiles(args)
+    def dirs =  files.collect{
+        new File(it).absoluteFile?.parent
+    }.unique().grep(it && it != '/')
+    return dirs
 }
 
 List<String> findDirs(String includes) {
