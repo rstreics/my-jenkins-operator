@@ -1,38 +1,28 @@
 #!/usr/bin/env groovy
 
-import hudson.Util
-
 import java.nio.file.Files
 import java.nio.file.Paths
 
-List<String> findFiles(args=[:]) {
-    def argv = [
-            dir: pwd(),
-            includes: '**/*',
-            excludes: null
-    ] << args
-    def basedir = new File(argv.dir as String)
-    return Util.
-            createFileSet(basedir, argv.includes, argv.excludes).
-            directoryScanner.
-            includedFiles.
-            collect {new File(it).absolutePath}.toList()
-}
 
 List<String> findDirs(args=[:]) {
-    def files = findFiles(args)
-    def dirs =  files.collect{
-        new File(it).absoluteFile?.parent
-    }.unique().grep{it && it != '/'}
-    return dirs
+    def argv = [
+            basedir: pwd(),
+            includes: '**/*',
+            absolutePath: true,
+    ] << args
+    dir(argv.basedir) {
+        result = findFiles(glob: argv.includes).
+                toList().
+                collect {
+                    def f = it.directory ? new File(it.path) : new File(it.path).parentFile
+                    argv.absolutePath ? f?.absolutePath : f?.path
+                }.findAll {it}.unique()
+    }
+    return result
 }
 
 List<String> findDirs(String includes) {
     findDirs(includes: includes)
-}
-
-List<String> findFiles(String includes) {
-    findFiles(includes: includes)
 }
 
 def tempDir(String name, Closure body=null) {
