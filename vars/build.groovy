@@ -114,9 +114,29 @@ def testSummary(args = [:]) {
 
         return "Passed: ${passed}, Failed: ${failed}, Skipped ${skipped}"
     }
-    return argv?.pretty ? "No tests found" : null
+    return argv.pretty ? "No tests available" : null
 }
 
+def printStackTrace(Throwable err) {
+    def sw = new StringWriter()
+    def pw = new PrintWriter(sw)
+    err.printStackTrace(pw)
+    echo "Exception ${err.toString()}\nStack trace: ${sw.toString()}"
+}
+
+def leftHandMenuDocument(Map args = [:]) {
+    def argv = [text: null, scope: 'job'] << args
+    Run build = $build()
+    def path = URLEncoder.encode(argv.text, "UTF-8").replace("+", "_20")
+    if (argv.scope == 'job') {
+        return build.url.replaceAll("/${build.number}[/]?\$", "/${path}")
+    }
+    return "${build.url}/${path}"
+}
+
+def leftHandMenuDocument(String text) {
+    return leftHandMenuLink([text: text])
+}
 
 def call() {
     new RunWrapper($build(), true)
