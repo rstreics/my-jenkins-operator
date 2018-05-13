@@ -1,43 +1,62 @@
 #!/usr/bin/env groovy
+/**
+ * Different utilities to work with files
+ */
 import hudson.FilePath
 
 import java.nio.file.Files
 import java.nio.file.Paths
 
-
+/**
+ * Finds directories that corresponds to Ant glob specified via named arg: includes
+ *
+ * @param args - named args: basedir, includes
+ * @return list of string
+ */
 List<String> findDirs(args=[:]) {
     def argv = [
-            basedir: pwd(),
-            includes: '**/*',
-            absolutePath: true,
+            basedir:  pwd(),
+            includes: '**/*'
     ] << args
-    def result = []
-    dir(argv.basedir) {
-        result = findFiles(glob: argv.includes).
-                toList().
-                collect {
-                    def f = new FilePath( new File(it.path) )
-                    if (!f.directory) {
-                        f = f.parent
-                    }
-                    def abs = f.absolutize()
-                    if (abs.exists()) {
-                        echo "Warning: directory ${abs.name} does not exist!"
-                    }
-                    abs.name
-                }.findAll {it}.unique()
-    }
-    return result
+    List<FilePath> files = new FilePath(new File(argv.basedir as String)).list(argv.includes as String)
+    return files.collect {
+        if (!it.directory) {
+            if (!it.parent) {
+                echo "Warning: ${it} has no parent"
+            }
+            it = it.parent
+        }
+        it
+    }.collect {
+        it.absolutize().remote
+    }.findAll{it}.unique()
 }
 
+/**
+ * Finds directories that corresponds to Ant glob. Searches in current directory (pwd)
+ *
+ * @param includes - Ant glob to use for search
+ * @return list of string
+ */
 List<String> findDirs(String includes) {
     findDirs(includes: includes)
 }
 
+/**
+ * Returns temp directory with prefix
+ * @param name - prefix
+ * @param body - optionally runs a closure
+ * @return absolute path as string
+ */
 def tempDir(String name, Closure body=null) {
     return tempDir(prefix: name, body)
 }
 
+/**
+ * Returns name of current directory
+ * @param args - pwd: true
+ * @return string
+ */
 def pwdDirName(args = [pwd: true]) {
     node('master') {
         String s =  pwd( args )
@@ -46,10 +65,20 @@ def pwdDirName(args = [pwd: true]) {
     }
 }
 
+/**
+ * Returns name of current directory
+ * @return string
+ */
 def getPwdDirName() {
     return pwdDirName()
 }
 
+/**
+ * Creates a temp directory
+ * @param arg named args[prefix, directory (pwd), deleteOnExit]
+ * @param body optional closure to execute
+ * @return string
+ */
 def tempDir(def arg=[:], Closure body=null) {
     def argv = [ prefix: '',
                  directory: pwd(tmp: true),
@@ -97,12 +126,21 @@ def tempDir(def arg=[:], Closure body=null) {
     return result
 }
 
-
-def tempFile(String... args) {
-    def list = (args as List)
-    return tempFile(path: list[0], extension: list[1])
+/**
+ * Create a temp file
+ * @param path - path to temp file
+ * @param ext - extension of a file
+ * @return string as path to the file
+ */
+def tempFile(path, ext) {
+    return tempFile(path: path, extension: ext)
 }
 
+/**
+ * Creates a temp file
+ * @param arg - names args [path, extension, deleteOnExit]
+ * @return string as path to the file
+ */
 def tempFile(Map arg=[:]) {
     String tempDir = pwd(temp: true)
     def argv = [ path: tempDir,
