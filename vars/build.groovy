@@ -11,6 +11,7 @@ import hudson.tasks.test.AbstractTestResultAction
 import hudson.model.Result
 import hudson.model.Run
 import org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper
+import org.jenkinsci.plugins.blueoceandisplayurl.BlueOceanDisplayURLImpl
 
 /**
  * @return true if current build is success
@@ -98,6 +99,24 @@ def leftShift(String text) {
         build.result = result
     }
     setAppendDescription( text )
+}
+
+def getBlueOceanUrl() {
+    Run build = $build()
+    new BlueOceanDisplayURLImpl().getRunURL( build )
+}
+
+def getBlueOceanChangesUrl() {
+    Run build = $build()
+    new BlueOceanDisplayURLImpl().getChangesURL( build )
+}
+
+def getBlueOceanTestsUrl() {
+    "${getBlueOceanUrl()}/tests"
+}
+
+def getBlueOceanArtifactsUrl() {
+    "${getBlueOceanUrl()}/artifacts"
 }
 
 def testSummary(args = [:]) {
