@@ -10,3 +10,4 @@ oic-auth:1.1
 swarm:3.10
 workflow-aggregator:2.5
 pipeline-utility-steps:2.0.2
+display-url-api:2.2.0
