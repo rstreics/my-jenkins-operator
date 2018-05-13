@@ -102,22 +102,22 @@ def leftShift(String text) {
     setAppendDescription( text )
 }
 
-def getBlueOceanUrl() {
+def getBlueOceanBuildPage() {
     Run build = $build()
     new BlueOceanDisplayURLImpl().getRunURL( build )
 }
 
-def getBlueOceanChangesUrl() {
+def getBlueOceanChangesPage() {
     Run build = $build()
     new BlueOceanDisplayURLImpl().getChangesURL( build )
 }
 
-def getBlueOceanTestsUrl() {
-    "${getBlueOceanUrl()}/tests"
+def getBlueOceanTestsPage() {
+    "${getBlueOceanBuildPage()}/tests"
 }
 
-def getBlueOceanArtifactsUrl() {
-    "${getBlueOceanUrl()}/artifacts"
+def getBlueOceanArtifactsPage() {
+    "${getBlueOceanBuildPage()}/artifacts"
 }
 
 def testSummary(args = [:]) {
