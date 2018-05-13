@@ -10,6 +10,7 @@ List<String> findDirs(args=[:]) {
             includes: '**/*',
             absolutePath: true,
     ] << args
+    def result = []
     dir(argv.basedir) {
         result = findFiles(glob: argv.includes).
                 toList().
@@ -26,7 +27,7 @@ List<String> findDirs(String includes) {
 }
 
 def tempDir(String name, Closure body=null) {
-    return call(prefix: name, body)
+    return tempDir(prefix: name, body)
 }
 
 def tempDir(def arg=[:], Closure body=null) {
@@ -79,7 +80,7 @@ def tempDir(def arg=[:], Closure body=null) {
 
 def tempFile(String... args) {
     def list = (args as List)
-    return call(path: list[0], extension: list[1])
+    return tempFile(path: list[0], extension: list[1])
 }
 
 def tempFile(Map arg=[:]) {
