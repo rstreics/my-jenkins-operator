@@ -1,4 +1,5 @@
 #!/usr/bin/env groovy
+import hudson.FilePath
 
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -35,6 +36,18 @@ List<String> findDirs(String includes) {
 
 def tempDir(String name, Closure body=null) {
     return tempDir(prefix: name, body)
+}
+
+def pwdDirName(args = [pwd: true]) {
+    node('master') {
+        String s =  pwd( args )
+        def pwd = new FilePath(new File(s))
+        return pwd.name
+    }
+}
+
+def getPwdDirName() {
+    return pwdDirName()
 }
 
 def tempDir(def arg=[:], Closure body=null) {
