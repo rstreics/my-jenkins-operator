@@ -62,46 +62,6 @@ boolean isBecomeUnstable() {
     return false
 }
 
-def appendDescription(String text) {
-    setAppendDescription(text)
-    return getDescription()
-}
-
-void setAppendDescription(String text) {
-    if (!text) {
-        return
-    }
-
-    String oneline = getDescription().replaceAll('\n',';')
-    List lines = oneline.split(';').collect{it?.trim()}.grep{it}
-    lines.add(text)
-
-    setDescription( lines.join('; ') )
-}
-
-void setDescription(String text) {
-    Run build = $build()
-    build.setDescription(text)
-}
-
-String getDescription() {
-    Run build = $build()
-    return build.description ?: ''
-}
-
-def leftShift(Exception err) {
-    leftShift(err.message ?: err.toString())
-}
-
-def leftShift(String text) {
-    Run build = $build()
-    def result = Result.fromString(text)
-    if (result) {
-        build.result = result
-    }
-    setAppendDescription( text )
-}
-
 def getBlueOceanBuildPage() {
     Run build = $build()
     new BlueOceanDisplayURLImpl().getRunURL( build )
