@@ -1,6 +1,6 @@
 ansicolor:0.5.2
 aws-java-sdk:1.11.264
-blueocean:1.4.2
+blueocean:1.5.0
 filesystem_scm:2.1
 github-organization-folder:1.6
 http_request:1.8.22
