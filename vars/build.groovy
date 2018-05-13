@@ -137,6 +137,11 @@ def testSummary(args = [:]) {
     return argv.pretty ? "No tests available" : null
 }
 
+def getFailedTestsCount() {
+    Run build = $build()
+    return build.getAction(AbstractTestResultAction)?.failedCount ?: 0
+}
+
 def printStackTrace(Throwable err) {
     def sw = new StringWriter()
     def pw = new PrintWriter(sw)
