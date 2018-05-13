@@ -10,6 +10,7 @@
 import hudson.tasks.test.AbstractTestResultAction
 import hudson.model.Result
 import hudson.model.Run
+import jenkins.scm.RunWithSCM
 import org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper
 import org.jenkinsci.plugins.blueoceandisplayurl.BlueOceanDisplayURLImpl
 
@@ -143,18 +144,26 @@ def printStackTrace(Throwable err) {
     echo "Exception ${err.toString()}\nStack trace: ${sw.toString()}"
 }
 
-def leftHandMenuDocument(Map args = [:]) {
-    def argv = [text: null, scope: 'job'] << args
-    Run build = $build()
-    def path = URLEncoder.encode(argv.text, "UTF-8").replace("+", "_20")
-    if (argv.scope == 'job') {
-        return build.url.replaceAll("/${build.number}[/]?\$", "/${path}")
-    }
-    return "${build.url}/${path}"
+def getBlameMessage() {
+    return blameMessage()
 }
 
-def leftHandMenuDocument(String text) {
-    return leftHandMenuLink([text: text])
+def blameMessage(args = []) {
+    def argv = [
+            author: false
+    ] << args
+    RunWithSCM build = $build()
+    def changesets = []
+    build.changeSets.each {
+        if (! it.emptySet) {
+            changesets << it.items
+        }
+    }
+    return changesets.collect {
+        argv.author \
+                ? "#${it.commitId?.take(7)}: ${it.msg}"
+                : "#${it.commitId?.take(7)}: ${it.msg} (${it.author})"
+    }
 }
 
 def call() {
