@@ -15,8 +15,15 @@ List<String> findDirs(args=[:]) {
         result = findFiles(glob: argv.includes).
                 toList().
                 collect {
-                    def f = it.directory ? new File(it.path) : new File(it.path).parentFile
-                    argv.absolutePath ? f?.absolutePath : f?.path
+                    def f = it.directory ? new File(it.path) : new File(it.path).parentFile ?: new File('/')
+                    if (argv.absolutePath) {
+                        f = Paths.get(pwd(), f.path).toFile()
+                        if (!f.exists()) {
+                            echo "Warning: ${f.path} does not exist!\nTaking ${f.absolutePath}, may be incorrect"
+                            f = f.absoluteFile
+                        }
+                    }
+                    f.path
                 }.findAll {it}.unique()
     }
     return result
