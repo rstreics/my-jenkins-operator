@@ -139,7 +139,7 @@ def testSummary(args = [:]) {
 
 def getFailedTestsCount() {
     Run build = $build()
-    return build.getAction(AbstractTestResultAction)?.failedCount ?: 0
+    return build.getAction(AbstractTestResultAction)?.failCount ?: 0
 }
 
 def printStackTrace(Throwable err) {
