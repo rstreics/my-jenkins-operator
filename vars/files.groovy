@@ -16,7 +16,7 @@ List<String> findDirs(args=[:]) {
         result = findFiles(glob: argv.includes).
                 toList().
                 collect {
-                    def f = new FilePath(it.path)
+                    def f = new FilePath( new File(it.path) )
                     if (!f.directory) {
                         f = f.parent
                     }
