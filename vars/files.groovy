@@ -1,11 +1,41 @@
-#!/usr/bin/env groovy
 /**
  * Different utilities to work with files
  */
 import hudson.FilePath
+import hudson.Util
+import org.apache.tools.ant.types.FileSet
 
+import java.nio.file.FileSystems
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
+
+/**
+ * Returns list of files with local `sh` command execution
+ * @param args named arguments (basedir, includes, excludes)
+ * @return
+ */
+List<String> findDirsWithShell(args=[:]) {
+    def argv = [
+            basedir:  pwd(),
+            includes: '**/*'
+    ] << args
+    def basedirf = new File(argv.basedir as String)
+    if (!basedirf.exists()) {
+        error "Base dir ${basedirf.name} does not exist"
+    }
+    String stdout = sh(returnStdout: true, script: "find -f ${argv.basedir}")
+    final def matcher = FileSystems.default.getPathMatcher("glob:${argv.includes}")
+
+    return stdout.
+            trim().
+            split('\n').
+            findAll{it}.
+            collect{ FileSystems.default.getPath( it ) }.
+            findAll{ matcher.matches( it ) }.
+            collect{ it.toFile().name }
+
+}
 
 /**
  * Finds directories that corresponds to Ant glob specified via named arg: includes
@@ -15,21 +45,23 @@ import java.nio.file.Paths
  */
 List<String> findDirs(args=[:]) {
     def argv = [
-            basedir:  pwd(),
-            includes: '**/*'
+            basedir: pwd(),
+            includes: '**/*',
+            absolutePath: true,
     ] << args
-    List<FilePath> files = new FilePath(new File(argv.basedir as String)).list(argv.includes as String)
-    return files.collect {
-        if (!it.directory) {
-            if (!it.parent) {
-                echo "Warning: ${it} has no parent"
-            }
-            it = it.parent
-        }
-        it
-    }.collect {
-        it.absolutize().remote
-    }.findAll{it}.unique()
+    def result = []
+    dir(argv.basedir) {
+        result = findFiles(glob: argv.includes).
+                toList().
+                collect {
+                    def f = new FilePath(new File(it.path))
+                    if (!f.directory) {
+                        f = f.parent
+                    }
+                    f.remote
+                }.findAll{it}.unique()
+    }
+    return result.collect{argv.basedir + File.separator + it}
 }
 
 /**
