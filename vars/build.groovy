@@ -106,7 +106,7 @@ def printStackTrace(Throwable err) {
     def sw = new StringWriter()
     def pw = new PrintWriter(sw)
     err.printStackTrace(pw)
-    echo "Exception ${err.toString()}\nStack trace: ${sw.toString()}"
+    echo "Exception ${err.class.name}: ${err.message}\nStack trace: ${sw.toString()}"
 }
 
 def getBlameMessage() {
