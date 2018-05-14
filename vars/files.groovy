@@ -1,41 +1,11 @@
 /**
  * Different utilities to work with files
  */
+
 import hudson.FilePath
-import hudson.Util
-import org.apache.tools.ant.types.FileSet
 
-import java.nio.file.FileSystems
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
-
-/**
- * Returns list of files with local `sh` command execution
- * @param args named arguments (basedir, includes, excludes)
- * @return
- */
-List<String> findDirsWithShell(args=[:]) {
-    def argv = [
-            basedir:  pwd(),
-            includes: '**/*'
-    ] << args
-    def basedirf = new File(argv.basedir as String)
-    if (!basedirf.exists()) {
-        error "Base dir ${basedirf.name} does not exist"
-    }
-    String stdout = sh(returnStdout: true, script: "find -f ${argv.basedir}")
-    final def matcher = FileSystems.default.getPathMatcher("glob:${argv.includes}")
-
-    return stdout.
-            trim().
-            split('\n').
-            findAll{it}.
-            collect{ FileSystems.default.getPath( it ) }.
-            findAll{ matcher.matches( it ) }.
-            collect{ it.toFile().name }
-
-}
 
 /**
  * Finds directories that corresponds to Ant glob specified via named arg: includes
