@@ -62,6 +62,12 @@ boolean isBecomeUnstable() {
     return false
 }
 
+boolean isResultChanged() {
+    return isBackToNormal()  ||
+            isBecomeFailure() ||
+            isBecomeUnstable()
+}
+
 String resultMessage() {
     if (isBackToNormal()) {
         return "Back to normal"
