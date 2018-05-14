@@ -109,18 +109,18 @@ def printStackTrace(Throwable err) {
     echo "Exception ${err.class.name}: ${err.message}\nStack trace: ${sw.toString()}"
 }
 
-def getBlameMessage() {
+List<String> getBlameMessage() {
     return blameMessage()
 }
 
-def blameMessage(args = [:]) {
+List<String> blameMessage(args = [:]) {
     def argv = [
             author: false
     ] << args
     RunWithSCM build = $build()
     def changesets = []
     build.changeSets.each {
-        if (! it.emptySet) {
+        if (!it.emptySet) {
             changesets << it.items
         }
     }
