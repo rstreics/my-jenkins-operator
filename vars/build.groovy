@@ -62,6 +62,24 @@ boolean isBecomeUnstable() {
     return false
 }
 
+String resultMessage() {
+    if (isBackToNormal()) {
+        return "Back to normal"
+    }
+    Run build = $build()
+    Result result = build.result ?: Result.SUCCESS
+    return result.toString().toLowerCase().capitalize()
+}
+
+String getResultMessage() {
+    if (isBackToNormal()) {
+        return "Back to normal"
+    }
+    Run build = $build()
+    Result result = build.result ?: Result.SUCCESS
+    return result.toString().toLowerCase().capitalize()
+}
+
 def getBlueOceanBuildPage() {
     Run build = $build()
     new BlueOceanDisplayURLImpl().getRunURL( build )
