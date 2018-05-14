@@ -113,7 +113,7 @@ def getBlameMessage() {
     return blameMessage()
 }
 
-def blameMessage(args = []) {
+def blameMessage(args = [:]) {
     def argv = [
             author: false
     ] << args
