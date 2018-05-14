@@ -3,6 +3,7 @@
  */
 
 import hudson.FilePath
+import org.apache.tools.ant.BuildException
 
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -21,14 +22,24 @@ List<String> findDirs(args=[:]) {
     ] << args
     def result = []
     dir(argv.basedir) {
-        result = findFiles(glob: argv.includes).
+        def filez
+        try {
+            filez = findFiles(glob: argv.includes)
+        } catch (BuildException err) {
+            // raises when current path does not exists
+            echo "${argv.basedir} does not exist"
+            err.printStackTrace()
+            return []
+        }
+
+        result = filez.
                 toList().
                 collect {
                     def f = new FilePath(new File(it.path))
                     if (!f.directory) {
                         f = f.parent
                     }
-                    f.remote
+                    f?.remote
                 }.findAll{it}.unique()
     }
     return result.collect{argv.basedir + File.separator + it}
