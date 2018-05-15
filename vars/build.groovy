@@ -109,7 +109,6 @@ def testSummary(args = [:]) {
 
     Run build = $build()
     def testResultAction = build.getAction(AbstractTestResultAction)
-
     if (testResultAction != null) {
         def total = testResultAction?.getTotalCount() ?: 0
         def failed = testResultAction?.getFailCount() ?: 0
@@ -121,9 +120,28 @@ def testSummary(args = [:]) {
     return argv.pretty ? "No tests available" : null
 }
 
-def getFailedTestsCount() {
+def getFailTestsCount() {
     Run build = $build()
     return build.getAction(AbstractTestResultAction)?.failCount ?: 0
+}
+
+def getSkipTestsCount() {
+    Run build = $build()
+    return build.getAction(AbstractTestResultAction)?.skipCount ?: 0
+}
+
+def getTotalTestsCount() {
+    Run build = $build()
+    return build.getAction(AbstractTestResultAction)?.totalCount ?: 0
+}
+
+def getPassTestsCount() {
+    Run build = $build()
+    def testResultAction = build.getAction(AbstractTestResultAction)
+    def total = testResultAction?.getTotalCount() ?: 0
+    def failed = testResultAction?.getFailCount() ?: 0
+    def skipped = testResultAction?.getSkipCount() ?: 0
+    return total - failed - skipped
 }
 
 def printStackTrace(Throwable err) {
@@ -137,22 +155,53 @@ List<String> getBlameMessage() {
     return blameMessage()
 }
 
-List<String> blameMessage(args = [:]) {
+def getRecentCommitCount() {
+    RunWithSCM build = $build()
+    def changesets = []
+    build.changeSets.each {
+        if (!it.emptySet) {
+            changesets += it.items
+        }
+    }
+    return changesets.size()
+}
+
+def formatBlameMessage(args=[:]) {
     def argv = [
-            author: false
+            author: false,
+            commit: null,
+            maxline: 60
     ] << args
     RunWithSCM build = $build()
     def changesets = []
     build.changeSets.each {
         if (!it.emptySet) {
-            changesets << it.items
+            changesets += it.items
         }
     }
-    return changesets.collect {
-        argv.author \
-                ? "#${it.commitId?.take(7)}: ${it.msg}"
-                : "#${it.commitId?.take(7)}: ${it.msg} (${it.author})"
+
+    if (changesets.empty) {
+        return "No recent changes"
     }
+
+    def change
+    if (argv.commit) {
+        def commit = argv.commit.take(7)
+        change = changesets.find { it.commitId?.take(7) == commit }
+        if (!change) {
+            error "Commit ${commit} not found"
+        }
+    } else {
+        change = changesets.first()
+    }
+
+    def head = "#${change.commitId.take(7)}"
+    def tail = argv.author ? "(${change.author})" : ''
+    def msg = change.msg
+    if (argv.maxline < (msg.size + head.size() + tail.size() + 2 )) {
+        msg = msg.take( argv.maxline - head.size() - tail.size() - 5  ) + '...'
+    }
+    return "${head} ${msg} ${tail}".trim()
 }
 
 def call() {
