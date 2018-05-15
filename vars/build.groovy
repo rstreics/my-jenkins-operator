@@ -166,6 +166,10 @@ def getRecentCommitCount() {
     return changesets.size()
 }
 
+def getChangesSummary() {
+    return changesSummary()
+}
+
 def changesSummary(args=[:]) {
     RunWithSCM build = $build()
     def changesets = []
