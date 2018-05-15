@@ -86,22 +86,28 @@ String getResultMessage() {
     return result.toString().toLowerCase().capitalize()
 }
 
-def getBlueOceanBuildPage() {
+String getBlueOceanBuildPage() {
     Run build = $build()
     new BlueOceanDisplayURLImpl().getRunURL( build )
 }
 
-def getBlueOceanChangesPage() {
+String getBlueOceanChangesPage() {
     Run build = $build()
     new BlueOceanDisplayURLImpl().getChangesURL( build )
 }
 
-def getBlueOceanTestsPage() {
-    "${getBlueOceanBuildPage()}/tests"
+String getBlueOceanTestsPage() {
+    def blueOcean = getBlueOceanBuildPage()
+    return blueOcean.endsWith("/") \
+            ? "${blueOcean}tests"
+            : "${blueOcean}/tests"
 }
 
-def getBlueOceanArtifactsPage() {
-    "${getBlueOceanBuildPage()}/artifacts"
+String getBlueOceanArtifactsPage() {
+    def blueOcean = getBlueOceanBuildPage()
+    return blueOcean.endsWith("/") \
+            ? "${blueOcean}artifacts"
+            : "${blueOcean}/artifacts"
 }
 
 def getTestSummary() {
