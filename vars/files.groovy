@@ -7,6 +7,9 @@ import org.apache.tools.ant.BuildException
 
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.logging.Logger
+
+def log = Logger.getLogger(this.class.name)
 
 /**
  * Finds directories that corresponds to Ant glob specified via named arg: includes
@@ -39,8 +42,8 @@ List<String> findDirs(args=[:]) {
                     if (!f.directory) {
                         f = f.parent
                     }
-                    f?.remote
-                }.findAll{it}.unique()
+                    f?.remote ?: ''
+                }.unique()
     }
     return result.collect{argv.basedir + File.separator + it}
 }
