@@ -166,12 +166,7 @@ def getRecentCommitCount() {
     return changesets.size()
 }
 
-def formatBlameMessage(args=[:]) {
-    def argv = [
-            author: false,
-            commit: null,
-            maxline: 60
-    ] << args
+def changesSummary(args=[:]) {
     RunWithSCM build = $build()
     def changesets = []
     build.changeSets.each {
@@ -184,24 +179,8 @@ def formatBlameMessage(args=[:]) {
         return "No recent changes"
     }
 
-    def change
-    if (argv.commit) {
-        def commit = argv.commit.take(7)
-        change = changesets.find { it.commitId?.take(7) == commit }
-        if (!change) {
-            error "Commit ${commit} not found"
-        }
-    } else {
-        change = changesets.first()
-    }
-
-    def head = "#${change.commitId.take(7)}"
-    def tail = argv.author ? "(${change.author})" : ''
-    def msg = change.msg
-    if (argv.maxline < (msg.size + head.size() + tail.size() + 2 )) {
-        msg = msg.take( argv.maxline - head.size() - tail.size() - 5  ) + '...'
-    }
-    return "${head} ${msg} ${tail}".trim()
+    def authors = changesets.collect {it.author}.unique()
+    return "${changesets.size()} commit${changesets.size()>1? 's' : ''} by ${authors.join(', ')}"
 }
 
 def call() {
