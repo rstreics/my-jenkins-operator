@@ -104,44 +104,31 @@ def getBlueOceanArtifactsPage() {
     "${getBlueOceanBuildPage()}/artifacts"
 }
 
-def testSummary(args = [:]) {
-    def argv = [pretty: false] << args
-
+def getTestSummary() {
     Run build = $build()
     def testResultAction = build.getAction(AbstractTestResultAction)
-    if (testResultAction != null) {
-        def total = testResultAction?.getTotalCount() ?: 0
-        def failed = testResultAction?.getFailCount() ?: 0
-        def skipped = testResultAction?.getSkipCount() ?: 0
-        def passed = total - failed - skipped
-
-        return "Passed: ${passed}, Failed: ${failed}, Skipped ${skipped}"
-    }
-    return argv.pretty ? "No tests available" : null
+    testResultAction \
+            ? "Passed: ${getTestPassCount()}, Failed: ${getTestFailCount()}, Skipped ${getTestSkipCount()}"
+            : null
 }
 
-def getFailTestsCount() {
+def getTestFailCount() {
     Run build = $build()
-    return build.getAction(AbstractTestResultAction)?.failCount ?: 0
+    build.getAction(AbstractTestResultAction)?.failCount ?: 0
 }
 
-def getSkipTestsCount() {
+def getTestSkipCount() {
     Run build = $build()
-    return build.getAction(AbstractTestResultAction)?.skipCount ?: 0
+    build.getAction(AbstractTestResultAction)?.skipCount ?: 0
 }
 
-def getTotalTestsCount() {
+def getTestTotalCount() {
     Run build = $build()
-    return build.getAction(AbstractTestResultAction)?.totalCount ?: 0
+    build.getAction(AbstractTestResultAction)?.totalCount ?: 0
 }
 
-def getPassTestsCount() {
-    Run build = $build()
-    def testResultAction = build.getAction(AbstractTestResultAction)
-    def total = testResultAction?.getTotalCount() ?: 0
-    def failed = testResultAction?.getFailCount() ?: 0
-    def skipped = testResultAction?.getSkipCount() ?: 0
-    return total - failed - skipped
+def getTestPassCount() {
+    getTestTotalCount() - getTestFailCount() - getTestSkipCount()
 }
 
 def printStackTrace(Throwable err) {
