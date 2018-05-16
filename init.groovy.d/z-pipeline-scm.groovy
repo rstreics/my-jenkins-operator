@@ -1,13 +1,11 @@
 #!/usr/bin/env groovy
-
+import com.cloudbees.hudson.plugins.folder.*
+import hudson.model.*
+import hudson.plugins.git.*
 import io.fabric8.kubernetes.client.*
 import jenkins.model.*
-import hudson.model.*
-import java.util.logging.Logger
-import hudson.plugins.git.*
 import org.jenkinsci.plugins.workflow.cps.*
 import org.jenkinsci.plugins.workflow.job.*
-import com.cloudbees.hudson.plugins.folder.*
 
 final DEFAULT_BRANCHSPEC =  "*/master"
 final DEFAULT_JENKINSFILE = "Jenkinsfile"
@@ -41,18 +39,19 @@ def jenk = Jenkins.instance
 def allJobs = jenk.getAllItems(AbstractProject)
 
 def client = new DefaultKubernetesClient(new ConfigBuilder().build())
+def jobs = []
 if (client.masterUrl && client.namespace) {
-  client.
-    configMaps().
-    withLabels([
+  jobs = client
+    .configMaps()
+    .withLabels([
       'project': 'jenkins',
       'qualifier': 'pipeline-scm'
-    ]).
-    list().
-    items.
-    grep { it.data }.
-    grep { allJobs.find {job -> job.name == it.metadata.name } == null }.
-    each {
+    ])
+    .list()
+    .items
+    .grep { it.data }
+    .grep { allJobs.find {job -> job.name == it.metadata.name } == null }
+    .collect {
       def repos = GitSCM.createRepoList(it.data.repositoryUrl, it.data.credentialsId)
       def branchSpec = new BranchSpec( it.data.branchSpec ?: DEFAULT_BRANCHSPEC)
       def scm = new GitSCM( repos, [branchSpec], false, [], null, null, [] )
@@ -65,6 +64,10 @@ if (client.masterUrl && client.namespace) {
       }
       def job = new WorkflowJob(parent, it.metadata.name)
       job.definition = flowDefinition
+
+      return job
     }
 }
 jenk.reload()
+
+jobs.each { it.scheduleBuild2(0) }
