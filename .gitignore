@@ -36,3 +36,4 @@ out
 .gradle
 build
 jenkins.iml
+.allure

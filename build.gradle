@@ -1,12 +1,24 @@
 group 'com.agilestacks.jenkins'
 version '1.0-SNAPSHOT'
 
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "io.qameta.allure:allure-gradle:2.5"
+  }
+}
+
 apply plugin: 'idea'
 apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'java-library'
 apply plugin: 'maven'
+apply plugin: 'io.qameta.allure'
 
 ext {
     groovyVersion = '2.4.15'
@@ -16,7 +28,7 @@ configurations {
     ivy
 }
 
-sourceCompatibility = 1.9
+sourceCompatibility = 1.8
 
 mainClassName = 'com.agilestacks.jenkins.operator.Main'
 
@@ -70,6 +82,8 @@ dependencies {
     compile 'io.fabric8:kubernetes-client:3.1.10'
     compile 'commons-cli:commons-cli:1.2'
     compile 'io.sundr:sundr-annotations:0.0.25'
+    compile 'org.aspectj:aspectjrt:1.9.1'
+
     compileOnly 'org.jenkins-ci.main:jenkins-core:2.117'
     compileOnly 'org.csanchez.jenkins.plugins:kubernetes:1.5.2'
     compileOnly 'javax.servlet:servlet-api:2.5'
@@ -86,6 +100,16 @@ dependencies {
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile 'io.fabric8:kubernetes-server-mock:3.1.10'
     testCompile 'com.squareup.okhttp3:mockwebserver:3.10.0'
+}
+
+allure {
+  autoconfigure = true
+  aspectjweaver = true
+  version = '2.5.0'
+
+  useSpock {
+    version = '2.0-BETA10'
+  }
 }
 
 tasks.withType(GroovyCompile) {
