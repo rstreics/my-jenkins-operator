@@ -42,7 +42,7 @@ String buildReport(Map args=[:]) {
     }
 
     Run currentBuild = $build()
-    def env = currentBuild.getEnvironment(new LogTaskListener(build.LOGGER, Level.INFO))
+    def env = currentBuild.getEnvironment(new LogTaskListener(currentBuild.LOGGER, Level.INFO))
     def result = "${build.getResultMessage()}: <${env.RUN_DISPLAY_URL}|${env.JOB_NAME} #${env.BUILD_NUMBER}>\n"
 
     if (currentBuild.description) {
