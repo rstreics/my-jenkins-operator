@@ -3,21 +3,17 @@
  * returns formatted map of parameters
  */
 def params(args = [:]) {
-    if (!args instanceof Map) {
-        args = [dir: args]
-    }
     def argv = [
             dirs: [],
             name: 'Allure'
     ] << args
-    def dirs = argv.dirs
-    if (argv.dir) {
-        dirs << argv.dir
-    }
-    if (!argv.dirs.empty) {
-        argv.dirs = [ pwd() ]
-    }
+
+    argv.dirs = (argv.dirs << argv.dir).findAll{it} ?: pwd()
     return argv
+}
+
+def publish(String dir) {
+    publish([dirs:[dir]])
 }
 
 /**
