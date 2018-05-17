@@ -26,11 +26,11 @@ sourceSets {
             srcDirs = ["src"]
         }
         groovy {
-            srcDirs = ["src", "vars"]
+            srcDirs = ["src"]
         }
-        resources {
-            srcDirs = ["resources"]
-        }
+       resources {
+           srcDirs = ["resources"]
+       }
     }
     test {
         java {
@@ -77,9 +77,10 @@ dependencies {
     compileOnly 'com.offbytwo.jenkins:jenkins-client:0.3.7'
     compileOnly 'org.jenkins-ci.plugins:cloudbees-folder:6.4'
     compileOnly 'org.jenkins-ci.plugins:git:3.6.0'
+    compileOnly 'org.jenkins-ci.plugins.workflow:workflow-step-api:2.9'
     compileOnly 'org.jenkins-ci.plugins.workflow:workflow-job:2.13'
     compileOnly 'org.jenkins-ci.plugins.workflow:workflow-cps:2.41'
-    compileOnly 'org.jenkins-ci.plugins.workflow:blueocean-display-url:2.1.0'
+    compileOnly 'org.jenkins-ci.plugins:blueocean-display-url:2.1.1'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'

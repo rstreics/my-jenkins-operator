@@ -9,7 +9,7 @@ class PipelineSpec extends Specification {
 
     KubernetesServer server
     KubernetesClient client
-    PipelineController controller
+    CustomResourceController controller
 
     def "list CRDs"() {
         given:
@@ -18,13 +18,15 @@ class PipelineSpec extends Specification {
                 .get()
                 .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
                 .andReturn(200, singlePipelineCrdList() ).always()
+        when:
+        controller.registerCRD(new Pipeline())
 
-        expect:
+        then:
             def result = client.customResourceDefinitions().list()
             1 == result.items.size()
     }
 
-    def "pipeline controller creates new CRD if needed"() {
+    def "controller creates new CRD"() {
         given:
         server.expect()
                 .get()
@@ -39,7 +41,7 @@ class PipelineSpec extends Specification {
                 .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
                 .andReturn(200, singlePipelineCrdList() ).once()
         when:
-        controller.registerCrd()
+        controller.registerCRD(new Pipeline())
 
         then:
         def result = client.customResourceDefinitions().list()
@@ -50,7 +52,7 @@ class PipelineSpec extends Specification {
         new CustomResourceDefinitionListBuilder()
                 .addNewItem()
                 .withNewMetadata()
-                .withName(controller.CRD)
+                .withName(new Pipeline().crdID)
                 .and().and()
                 .build()
     }
@@ -63,7 +65,7 @@ class PipelineSpec extends Specification {
         server = new KubernetesServer()
         server.before()
         client = server.client
-        controller = new PipelineController( kubernetes: client )
+        controller = new CustomResourceController( kubernetes: client )
     }
 
     def cleanup() {

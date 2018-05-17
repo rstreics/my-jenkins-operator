@@ -1,0 +1,31 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: vars.jenkins.agilestacks.com
+spec:
+  group: jenkins.agilestacks.com
+  version: v1
+  scope: Namespaced
+  names:
+    plural: vars
+    singular: var
+    kind: Variable
+    shortNames: [vars]
+  validation:
+    openAPIV3Schema:
+      type: object
+      properties:
+        spec:
+          type: object
+          properties:
+            variables:
+              type: object
+              properties: {}
+            status:
+              type: object
+              properties:
+                code:
+                  type: string
+                  pattern: '(PENDING|CONVERGED|ERROR)'
+                message:
+                  type: string
