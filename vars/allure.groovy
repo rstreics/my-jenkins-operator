@@ -14,7 +14,7 @@ def params(args = [:]) {
 
     argv.dirs = (argv.dirs << argv.dir).findAll{it} ?: argv.basedir
     argv.dirs = argv.dirs.collect{
-        new File(it).absolute ? it : Paths.get(argv.basedir, it)
+        new File(it).absolute ? it : Paths.get(argv.basedir, it).toString()
     }
 
     return argv
