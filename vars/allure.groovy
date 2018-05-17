@@ -1,3 +1,6 @@
+import org.apache.commons.io.FileExistsException
+
+import java.nio.file.Paths
 
 /**
  * returns formatted map of parameters
@@ -5,10 +8,15 @@
 def params(args = [:]) {
     def argv = [
             dirs: [],
-            name: 'Allure'
+            name: 'Allure',
+            basedir: pwd()
     ] << args
 
-    argv.dirs = (argv.dirs << argv.dir).findAll{it} ?: pwd()
+    argv.dirs = (argv.dirs << argv.dir).findAll{it} ?: argv.basedir
+    argv.dirs = argv.dirs.collect{
+        new File(it).absolute ? it : Paths.get(argv.basedir, it)
+    }
+
     return argv
 }
 

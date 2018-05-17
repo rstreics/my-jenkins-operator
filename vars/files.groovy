@@ -45,7 +45,7 @@ List<String> findDirs(args=[:]) {
                     f?.remote ?: ''
                 }.unique()
     }
-    return result.collect{argv.basedir + File.separator + it}
+    return result.collect{Paths.get(argv.basedir, it)}
 }
 
 /**
