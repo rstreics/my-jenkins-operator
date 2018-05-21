@@ -20,7 +20,7 @@ class PipelineSpec extends Specification {
                 .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
                 .andReturn(200, singlePipelineCrdList() ).always()
         when:
-        controller.apply(new Pipeline())
+        controller.apply(new Pipeline().definition)
 
         then:
             def result = client.customResourceDefinitions().list()
@@ -42,11 +42,11 @@ class PipelineSpec extends Specification {
                 .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
                 .andReturn(200, singlePipelineCrdList() ).once()
         when:
-        controller.apply(new Pipeline())
+        controller.apply(new Pipeline().definition)
 
         then:
-        def result = client.customResourceDefinitions().list()
-        1 == result.items.size()
+            def result = client.customResourceDefinitions().list()
+            1 == result.items.size()
     }
 
     def singlePipelineCrdList() {
