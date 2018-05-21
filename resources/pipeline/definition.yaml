@@ -28,11 +28,11 @@ spec:
               type: string
             folder:
               type: string
-            # status:
-            #   type: object
-            #   properties:
-            #     code:
-            #       type: string
-            #       pattern: '(PENDING|CONVERGED|ERROR|UNDEFINED)'
-            #     message:
-            #       type: string
+            status:
+              type: object
+              properties:
+                code:
+                  type: string
+                  pattern: '(PENDING|CONVERGED|ERROR|UNDEFINED)'
+                message:
+                  type: string
