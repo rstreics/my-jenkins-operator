@@ -33,9 +33,9 @@ pipeline {
   post {
     always {
       junit testResults: 'build/test-results/**/*.xml'
-      container('buildbox') {
-        sh script: './gradlew allureReport'
-      }
+      // container('buildbox') {
+      //   sh script: './gradlew allureReport'
+      // }
       publishHTML(target: [
                   allowMissing         : true,
                   alwaysLinkToLastBuild: false,
@@ -43,17 +43,17 @@ pipeline {
                   reportDir            : 'build/reports/tests/test',
                   reportFiles          : 'index.html',
                   reportName           : 'Spock',])
-      publishHTML(target: [
-                  allowMissing         : true,
-                  alwaysLinkToLastBuild: false,
-                  keepAll              : true,
-                  reportDir            : 'build/reports/allure-report',
-                  reportFiles          : 'index.html',
-                  reportName           : 'Allure',])
+      // publishHTML(target: [
+      //             allowMissing         : true,
+      //             alwaysLinkToLastBuild: false,
+      //             keepAll              : true,
+      //             reportDir            : 'build/reports/allure-report',
+      //             reportFiles          : 'index.html',
+      //             reportName           : 'Allure',])
     }
     changed {
       slackSend color: slack.buildColor,
-                message: slack.buildReport(htmlReports: ['Allure', 'Spock'])
+                message: slack.buildReport(htmlReports: ['Spock'])
     }
   }
 }

@@ -18,7 +18,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'java-library'
 apply plugin: 'maven'
-apply plugin: 'io.qameta.allure'
+//apply plugin: 'io.qameta.allure'
 
 ext {
     groovyVersion = '2.4.15'
@@ -28,7 +28,7 @@ configurations {
     ivy
 }
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.9
 
 mainClassName = 'com.agilestacks.jenkins.operator.Main'
 
@@ -102,15 +102,15 @@ dependencies {
     testCompile 'com.squareup.okhttp3:mockwebserver:3.10.0'
 }
 
-allure {
-  autoconfigure = true
-  aspectjweaver = true
-  version = '2.5.0'
-
-  useSpock {
-    version = '2.0-BETA10'
-  }
-}
+//allure {
+//  autoconfigure = true
+//  aspectjweaver = true
+//  version = '2.5.0'
+//
+//  useSpock {
+//    version = '2.0-BETA10'
+//  }
+//}
 
 tasks.withType(GroovyCompile) {
     groovyClasspath += configurations.ivy
