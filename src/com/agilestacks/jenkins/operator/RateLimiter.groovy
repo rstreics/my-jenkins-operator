@@ -4,6 +4,10 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
+/**
+ * Rate limiting single threaded queue. Needed to throttle calls to Kubernetes,
+ * So API server should not be overloaded otherwise it can go panic
+ */
 class RateLimiter implements Runnable {
     final static CAPACITY = 1024
     final queue = new ArrayBlockingQueue<Closure>(CAPACITY)
