@@ -10,8 +10,8 @@ class JenkinsHttpClientSpec extends Specification {
     MockWebServer server
     JenkinsHttpClient client
 
-    final SUCCESS = 'Status: CONVERGED <EOF>'
-    final ERROR = 'Status: ERROR <EOF>'
+//    final SUCCESS = 'Status: CONVERGED <EOF>'
+//    final ERROR = 'Status: ERROR <EOF>'
 
     def "send ping request and receive version number"() {
         given:
@@ -23,48 +23,38 @@ class JenkinsHttpClientSpec extends Specification {
             version == resp
     }
 
-    def "send script successfully"() {
+    def "initiate successful post request"() {
         given:
-            server.enqueue(new MockResponse().setBody(SUCCESS))
-
-            def groovy = """
-                println "Hello, World"
-                println "${SUCCESS}"
-            """.stripIndent().trim()
+            server.enqueue(new MockResponse().setResponseCode(200).setBody('ok'))
         when:
-            def resp = client.postScript(groovy)
+            def resp = client.post('/script', [script: 'dummmy'])
         then:
-            resp =~ MAGIC_STRING
+            resp == 'ok'
     }
 
-    def "send script with http error"() {
+    def "initiate post requests and handle error"() {
         given:
             server.enqueue(new MockResponse().setResponseCode(404))
-            def groovy = """
-                println "Hello, World"
-                println "${SUCCESS}"
-            """.stripIndent().trim()
         when:
-            client.postScript(groovy)
-
+            client.post('/script', [script: 'dummmy'])
         then:
             thrown( ConnectException )
     }
 
-    def "send script with script error"() {
-        given:
-            server.enqueue(new MockResponse().setBody(ERROR))
-
-            def groovy = """
-                println "Hello, World"
-                println "${SUCCESS}"
-            """.stripIndent().trim()
-        when:
-            client.postScript(groovy)
-
-        then:
-            thrown( RuntimeException )
-    }
+//    def "correctly handle post request with error"() {
+//        given:
+//            server.enqueue(new MockResponse().setBody(ERROR))
+//
+//            def groovy = """
+//                println "Hello, World"
+//                println "${SUCCESS}"
+//            """.stripIndent().trim()
+//        when:
+//            client.postScript(groovy)
+//
+//        then:
+//            thrown( RuntimeException )
+//    }
 
     def setup() {
         server = new MockWebServer()

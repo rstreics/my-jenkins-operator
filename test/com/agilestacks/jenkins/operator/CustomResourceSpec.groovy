@@ -1,31 +1,30 @@
 package com.agilestacks.jenkins.operator
 
+import com.agilestacks.jenkins.operator.crd.ScriptableResource
 import spock.lang.Specification
 
 class CustomResourceSpec extends Specification {
     static final MAGIC_STRING = /(?i)\s*print(ln)?\s*[(]?\s*['"]Status:\s+CONVERGED\s*<EOF>\s*['"]\s*[)]?\s*[;]?\s*/
 
-    def "pipeline custom resource has been set up correctly"() {
+    def "pipeline custom resource scripts has magic string"() {
         given:
-            def resource = new Pipeline()
+            def rsc = new Pipeline()
         expect:
-            validCustomResource(resource)
-            resource.createScript =~ MAGIC_STRING
-            resource.deleteScript =~ MAGIC_STRING
+            validCustomResource(rsc)
+            rsc.createScript =~ MAGIC_STRING
+            rsc.deleteScript =~ MAGIC_STRING
     }
 
-    def "vars custom resource has been set up correctly"() {
+    def "vars custom resource scripts has magic string"() {
         given:
-            def resource = new Variables()
+            def rsc = new Variables()
         expect:
-            validCustomResource(resource)
-            resource.createScript =~ MAGIC_STRING
-            resource.deleteScript =~ MAGIC_STRING
+            validCustomResource(rsc)
+            rsc.createScript =~ MAGIC_STRING
+            rsc.deleteScript =~ MAGIC_STRING
     }
 
-    def validCustomResource(JenkinsCustomResource resource) {
-        resource.definition &&
-                resource.createScript &&
-                resource.deleteScript
+    def validCustomResource(ScriptableResource rsc) {
+        rsc.definition && rsc.createScript && rsc.deleteScript
     }
 }

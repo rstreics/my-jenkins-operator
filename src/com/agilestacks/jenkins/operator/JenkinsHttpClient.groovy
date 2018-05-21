@@ -12,8 +12,6 @@ import okhttp3.Route
 import java.util.logging.Logger
 
 class JenkinsHttpClient  {
-    static final MAGIC_STRING = /(?i)\s*Status\s*:\s+CONVERGED\s*<EOF>\s*/
-
     static final log = Logger.getLogger(JenkinsHttpClient.name)
 
     HttpUrl masterUrl = HttpUrl.parse('http://localhost:8080')
@@ -23,7 +21,7 @@ class JenkinsHttpClient  {
     }
 
     JenkinsHttpClient(String url, String username = null, String password = null) {
-        this( serverUrl(url, username, password) )
+        this( toHttpUrl(url, username, password) )
     }
 
     def newClient(HttpUrl url=masterUrl) {
@@ -39,47 +37,38 @@ class JenkinsHttpClient  {
         return builder.build()
     }
 
-    static def serverUrl(String url, String username=null, String password=null) {
-        def builder = HttpUrl.parse(url).newBuilder()
-        if (username) {
-            builder.username(username)
-        }
-        if (password) {
-            builder.password(password)
-        }
-        return builder.build()
+    String post(String uri, Map formBody = [:]) {
+        post(uri.toURI())
     }
 
-    def postScript(String script, HttpUrl baseUrl=masterUrl) {
-        def builder = baseUrl
-                        .newBuilder()
-                        .addPathSegment('script')
+    String post(URI uri, Map formBody = [:]) {
+        def url = masterUrl.newBuilder()
+        uri.path.split('/').each {
+            url.addPathSegment(it)
+        }
+
+        def body = new FormBody.Builder()
+        formBody.each { k, v ->
+            body.add(k, v)
+        }
 
         def request = new Request.Builder()
-                        .url( builder.build() )
-                        .post( new FormBody.Builder().add('script', script).build() )
-                        .build()
-        log.info("Calling http ${request}")
+            .url( url.build() )
+            .post( body.build() )
+            .build()
+
         def resp = newClient().newCall(request).execute()
         if (resp.code() >= 400) {
             throw new ConnectException("""Unable to ${request.method()} ${request.url().toString()} 
                                           got response [code: ${resp.code()}, text: ${resp.body().string()}]
                                        """.stripIndent().trim())
         }
-
-        def text = resp.body().string()
-        if (!(text =~ JenkinsHttpClient.MAGIC_STRING)) {
-            throw new RuntimeException("""Internal error during processing script
-                                          [code: ${resp.code()}, text: ${text}]
-                                       """.stripIndent().trim())
-        }
-
-        text
+        return resp.body().string()
     }
 
-    def ping(HttpUrl baseUrl=masterUrl) {
+    def ping() {
         def request = new Request.Builder()
-                        .url(baseUrl)
+                        .url(masterUrl)
                         .get()
                         .build()
         log.finer("Calling http ${request}")
@@ -92,4 +81,14 @@ class JenkinsHttpClient  {
         return resp.header('X-Jenkins') ?:  'Unknown'
     }
 
+    private static HttpUrl toHttpUrl(String url, String username=null, String password=null) {
+        def builder = HttpUrl.parse(url).newBuilder()
+        if (username) {
+            builder.username(username)
+        }
+        if (password) {
+            builder.password(password)
+        }
+        return builder.build()
+    }
 }

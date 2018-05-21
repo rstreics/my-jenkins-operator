@@ -1,5 +1,6 @@
 package com.agilestacks.jenkins.operator
 
+import com.agilestacks.jenkins.operator.crd.KubernetesResourceController
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionListBuilder
 import io.fabric8.kubernetes.client.KubernetesClient
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer
@@ -9,7 +10,7 @@ class PipelineSpec extends Specification {
 
     KubernetesServer server
     KubernetesClient client
-    CustomResourceController controller
+    KubernetesResourceController controller
 
     def "list CRDs"() {
         given:
@@ -19,7 +20,7 @@ class PipelineSpec extends Specification {
                 .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
                 .andReturn(200, singlePipelineCrdList() ).always()
         when:
-        controller.registerCRD(new Pipeline())
+        controller.apply(new Pipeline())
 
         then:
             def result = client.customResourceDefinitions().list()
@@ -41,7 +42,7 @@ class PipelineSpec extends Specification {
                 .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
                 .andReturn(200, singlePipelineCrdList() ).once()
         when:
-        controller.registerCRD(new Pipeline())
+        controller.apply(new Pipeline())
 
         then:
         def result = client.customResourceDefinitions().list()
@@ -65,7 +66,7 @@ class PipelineSpec extends Specification {
         server = new KubernetesServer()
         server.before()
         client = server.client
-        controller = new CustomResourceController( kubernetes: client )
+        controller = new KubernetesResourceController( kubernetes: client )
     }
 
     def cleanup() {
