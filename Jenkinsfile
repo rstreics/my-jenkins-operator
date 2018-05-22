@@ -25,6 +25,12 @@ pipeline {
       steps {
         container('buildbox') {
           sh script: './gradlew compileGroovy'
+        }
+      }
+    }
+    stage('Test') {
+      steps {
+        container('buildbox') {
           sh script: './gradlew cleanTest test'
           sh script: './gradlew codenarcMain'
         }
