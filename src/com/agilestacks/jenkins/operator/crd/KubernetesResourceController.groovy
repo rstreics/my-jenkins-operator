@@ -1,16 +1,11 @@
 package com.agilestacks.jenkins.operator.crd
 
 import com.agilestacks.jenkins.operator.JenkinsHttpClient
-import com.agilestacks.jenkins.operator.Pipeline
 import com.agilestacks.jenkins.operator.RateLimiter
-import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
-import io.fabric8.kubernetes.client.BaseClient
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
-import io.fabric8.kubernetes.client.KubernetesClient
 import io.fabric8.kubernetes.client.KubernetesClientException
 import io.fabric8.kubernetes.client.Watcher
 import io.fabric8.kubernetes.client.dsl.base.OperationSupport
-import io.fabric8.kubernetes.client.dsl.internal.CustomResourceDefinitionOperationsImpl
 import okhttp3.Request
 import okhttp3.RequestBody
 
