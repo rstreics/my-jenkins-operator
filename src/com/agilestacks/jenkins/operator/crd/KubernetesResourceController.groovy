@@ -69,18 +69,18 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         }
         if (action == Action.ADDED) {
             queue.enqueue {
-                resource.sendCreateScript(jenkins)
+                resource.create(jenkins)
                 resource.status = Status.Code.CONVERGED
             }
         } else if (action == Action.DELETED) {
             queue.enqueue {
-                resource.sendDeleteScript(jenkins)
+                resource.delete(jenkins)
                 resource.status = Status.Code.CONVERGED
             }
         } else if (action == Action.MODIFIED) {
             queue.enqueue {
-                resource.sendDeleteScript(jenkins)
-                resource.sendCreateScript(jenkins)
+                resource.delete(jenkins)
+                resource.create(jenkins)
                 resource.status = Status.Code.CONVERGED
             }
         } else {

@@ -10,7 +10,7 @@ class CustomResourceSpec extends Specification {
         given:
             def rsc = new Pipeline()
         expect:
-            validCustomResource(rsc)
+            hasDefinitionAndScripts(rsc)
             rsc.createScript =~ MAGIC_STRING
             rsc.deleteScript =~ MAGIC_STRING
     }
@@ -19,12 +19,12 @@ class CustomResourceSpec extends Specification {
         given:
             def rsc = new Variables()
         expect:
-            validCustomResource(rsc)
+            hasDefinitionAndScripts(rsc)
             rsc.createScript =~ MAGIC_STRING
             rsc.deleteScript =~ MAGIC_STRING
     }
 
-    def validCustomResource(ScriptableResource rsc) {
+    def hasDefinitionAndScripts(ScriptableResource rsc) {
         rsc.definition && rsc.createScript && rsc.deleteScript
     }
 }
