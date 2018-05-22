@@ -60,7 +60,7 @@ pipeline {
     }
     changed {
       slackSend color: slack.buildColor,
-                message: slack.buildReport(htmlReports: ['Spock'])
+                message: slack.buildReport(htmlReports: ['Spock', 'Lint'])
     }
   }
 }
