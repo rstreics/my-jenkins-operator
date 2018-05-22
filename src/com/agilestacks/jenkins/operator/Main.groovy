@@ -6,9 +6,6 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient
 import java.util.logging.Logger
 
 class Main {
-
-    final log = Logger.getLogger(this.class.name)
-
     static final private String DEFAULT_NAMESPACE = 'jenkins'
     static final def OPTS = [:]
 
@@ -17,6 +14,8 @@ class Main {
     }
 
     static void main(String[] args) {
+        final log = Logger.getLogger(Main.name)
+
         def cli = new CliBuilder(usage: 'ls')
         cli.help('print this message')
         cli.ns(longOpt: 'namespace', valueSeparator: '=', args: 1, argName: 'namespace', 'Namespace for operator to watch')
