@@ -1,6 +1,7 @@
 package com.agilestacks.jenkins.operator
 
 import com.agilestacks.jenkins.operator.crd.ScriptableResource
+import com.agilestacks.jenkins.share.StringReplace
 import io.fabric8.kubernetes.client.CustomResource
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -60,6 +61,24 @@ class ScriptableResourceSpec extends Specification {
             resource.delete(client)
         then:
             thrown(RuntimeException)
+    }
+
+    def "format script should replace unrendered mustaches with empty string"() {
+        given:
+            def script = """\
+                        final NAME           = '{{metadata.name}}'
+                        final URL            = '{{spec.repositoryUrl}}'
+                        final BRANCH_SPEC    = '{{spec.branchSpec}}'
+                        final JENKINSFILE    = '{{spec.pipeline}}'
+                        final CREDENTIALS_ID = '{{spec.credentialsId}}'
+                        final FOLDER         = '{{spec.folder}}'"""
+            def resource = new DummyCustomResource()
+            resource.metadata.name = 'Dummy'
+        when:
+            String result = resource.formatGroovyScript(script)
+        then:
+            result =~ /''/
+            !(result =~ StringReplace.MUSTACHE)
     }
 
 

@@ -27,11 +27,11 @@ trait ScriptableResource implements HasMetadata, Status {
     abstract String getDeleteScriptFile()
 
     String getCreateScript() {
-      return formatGroovyScript( createScriptFile )
+      return formatGroovyScriptFromClasspath( createScriptFile )
     }
 
     String getDeleteScript() {
-      return formatGroovyScript( deleteScriptFile )
+      return formatGroovyScriptFromClasspath( deleteScriptFile )
     }
 
     Definition definition = { Definition.fromClasspath( definitionFile ) }()
@@ -41,20 +41,8 @@ trait ScriptableResource implements HasMetadata, Status {
     }
 
     @JsonProperty("spec")
-    def setSpec(def newSpec = [:]) {
-        spec << newSpec
-    }
-
-    def asMap(Map map=['spec': spec,
-                       'metadata.name': metadata?.name,
-                       'metadata.namespace': metadata?.namespace]) {
-        return map.collectEntries { k, v ->
-            v instanceof Map ?
-                    asMap(v).collectEntries { k1, v1 ->
-                        [ ("${k}.${k1}".toString()) : v1 ]
-                    }
-                    : [ (k): v ]
-        }
+    void setSpec(Map newSpec) {
+        this.spec << newSpec
     }
 
     def create(JenkinsHttpClient jenkins) {
@@ -66,18 +54,29 @@ trait ScriptableResource implements HasMetadata, Status {
     }
 
     def sendScript(String script, JenkinsHttpClient jenkins) {
-        def resp = jenkins.post('script', ['scriptText': script])
+        def resp = jenkins.post('scriptText', ['script': script])
         if (!(resp =~ MAGIC_STRING)) {
-            throw new RuntimeException("""Internal error during processing script
-                                          [code: ${resp.code()}, text: ${text}]
-                                       """.stripIndent().trim())
+            throw new RuntimeException("Internal error during processing script:\n${resp}".stripIndent().trim())
         }
         resp
     }
 
-    private String formatGroovyScript(String filename) {
-        String template = ScriptableResource.getResourceAsStream(filename).text
-        return new StringReplace().mustache(template, this.asMap())
+    def Map toMap() {
+        ['kind': kind,
+         'apiVersion': apiVersion,
+         'spec': spec,
+         'metadata': metadata.properties]
+    }
+
+    String formatGroovyScriptFromClasspath(String filename) {
+        String text = ScriptableResource.getResourceAsStream(filename).text
+        formatGroovyScript(text)
+    }
+
+    String formatGroovyScript(String text) {
+        def templater = new StringReplace()
+        def rendered = templater.mustache(text, this.toMap())
+        templater.eraseMustache(rendered)
     }
 
     static class Definition extends CustomResourceDefinition implements Props {
