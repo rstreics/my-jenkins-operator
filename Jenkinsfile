@@ -26,7 +26,7 @@ pipeline {
         container('buildbox') {
           sh script: './gradlew compileGroovy'
           sh script: './gradlew cleanTest test'
-          sh script: 'codenarcMain'
+          sh script: './gradlew codenarcMain'
         }
       }
     }
