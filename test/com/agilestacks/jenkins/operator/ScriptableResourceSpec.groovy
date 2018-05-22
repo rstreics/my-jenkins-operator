@@ -46,9 +46,9 @@ class ScriptableResourceSpec extends Specification {
             def resource = new DummyCustomResource()
             server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${MAGIC_STRING}'"))
         when:
-            def result1 = resource.sendScript(resource.createScript, client)
+            def result = resource.sendScript(resource.createScript, client)
         then:
-        thrown
+            result =~ MAGIC_STRING
     }
 
     def "send script should throw exception if invalid magic string"() {
@@ -56,10 +56,10 @@ class ScriptableResourceSpec extends Specification {
             def resource = new DummyCustomResource()
             server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${INVALID_MAGIC_STRING}'"))
         when:
-            def result1 = resource.create(client)
-            def result2 = resource.delete(client)
+            resource.create(client)
+            resource.delete(client)
         then:
-            thrown
+            thrown(RuntimeException)
     }
 
 
