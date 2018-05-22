@@ -44,29 +44,25 @@ class Main {
             jenkinsUrl = 'http://localhost:8080'
         }
 
-        String jenkinsUsername = options.jenkinsUsername
-        String jenkinsPassword = options.jenkinsPassword
+        String jenkinsUsername = options.jenkinsUsername ?: System.getenv('JENKINS_USERNAME')
+        String jenkinsPassword = options.jenkinsPassword ?: System.getenv('JENKINS_PASSWORD')
 
         def rateLimiter = new RateLimiter()
         def jenkinsClient = new JenkinsHttpClient(jenkinsUrl, jenkinsUsername, jenkinsPassword)
-        def kubernetesClient = new DefaultKubernetesClient().inNamespace(namespace)
-        try {
-            log.info "Connecting to server: ${jenkinsUrl}"
-            log.info "Connected to Jenkins v${jenkinsClient.ping()}"
+        def kubernetesClient = new DefaultKubernetesClient()
+        log.info "Connecting to server: ${jenkinsUrl}"
+        log.info "Connected to Jenkins v${jenkinsClient.ping()}"
 
-            KubernetesResourceController controller = new KubernetesResourceController(
-                kubernetes: kubernetesClient,
-                queue: rateLimiter,
-                jenkins: jenkinsClient)
+        KubernetesResourceController controller = new KubernetesResourceController(
+            kubernetes: kubernetesClient,
+            queue: rateLimiter,
+            jenkins: jenkinsClient)
 
-            log.info "Connecting to Kubernetes: ${kubernetesClient.masterUrl}"
-            def pipe = new Pipeline()
-            controller.apply(pipe.definition)
-//            controller.watch(pipe)
-            rateLimiter.startAtFixedRate()
-        } finally {
-            log.info "Closing connection to kubernetes"
-            kubernetesClient.close()
-        }
+        log.info "Connecting to Kubernetes: ${kubernetesClient.masterUrl}, namespace: ${kubernetesClient.namespace}"
+        log.info "Connected: ${kubernetesClient.http}"
+        def pipe = new Pipeline()
+        controller.apply(pipe.definition)
+        controller.watch(pipe)
+        rateLimiter.startAtFixedRate()
     }
 }

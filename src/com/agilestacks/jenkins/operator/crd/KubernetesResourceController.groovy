@@ -4,9 +4,12 @@ import com.agilestacks.jenkins.operator.JenkinsHttpClient
 import com.agilestacks.jenkins.operator.Pipeline
 import com.agilestacks.jenkins.operator.RateLimiter
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
+import io.fabric8.kubernetes.client.BaseClient
+import io.fabric8.kubernetes.client.DefaultKubernetesClient
 import io.fabric8.kubernetes.client.KubernetesClient
 import io.fabric8.kubernetes.client.KubernetesClientException
 import io.fabric8.kubernetes.client.Watcher
+import io.fabric8.kubernetes.client.dsl.base.OperationSupport
 import io.fabric8.kubernetes.client.dsl.internal.CustomResourceDefinitionOperationsImpl
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -16,12 +19,12 @@ import java.util.logging.Logger
 class KubernetesResourceController<T extends ScriptableResource> implements Watcher<T> {
     static final log = Logger.getLogger(KubernetesResourceController.name)
 
-    KubernetesClient kubernetes
+    DefaultKubernetesClient kubernetes
     RateLimiter queue
     JenkinsHttpClient jenkins
 
-    def crdOperations() {
-        return kubernetes.customResourceDefinitions() as CustomResourceDefinitionOperationsImpl
+    def getCrd() {
+        return kubernetes.customResourceDefinitions() as OperationSupport
     }
 
     def apply(ScriptableResource.Definition definition) {
@@ -33,13 +36,11 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
             return
         }
         log.info("Creating custom resource definition: ${name}")
-
-        def crd = crdOperations()
         def request = new Request.Builder()
-                .post(RequestBody.create( crd.JSON, definition.toJsonString() ))
+                .post(RequestBody.create( OperationSupport.JSON, definition.toJsonString() ))
                 .url(crd.resourceUrl)
                 .build()
-        def resp = crd.client.newCall(request).execute()
+        def resp = kubernetes.httpClient.newCall(request).execute()
 
         log.finest("Response: [${resp.toString()}]")
         if (resp.code() > 400) {
