@@ -9,6 +9,7 @@ import org.jenkinsci.plugins.workflow.job.*
 import com.cloudbees.hudson.plugins.folder.*
 
 final NAME           = '{{metadata.name}}' ?: null
+final URL            = '{{spec.repositoryUrl}}' ?: null
 final BRANCH_SPEC    = '{{spec.branchSpec}}' ?: '*/master'
 final JENKINSFILE    = '{{spec.pipeline}}' ?: 'Jenkinsfile'
 final CREDENTIALS_ID = '{{spec.credentialsId}}' ?: null
@@ -45,7 +46,7 @@ if (!found) {
         parent = createFolder(FOLDER)
     }
 
-    def repos = GitSCM.createRepoList( CREDENTIALS_ID )
+    def repos = GitSCM.createRepoList(URL, CREDENTIALS_ID)
     def branchSpec = new BranchSpec( BRANCH_SPEC )
     def scm = new GitSCM(repos, [branchSpec], false, [], null, null, [])
     def job = new WorkflowJob(parent, NAME )

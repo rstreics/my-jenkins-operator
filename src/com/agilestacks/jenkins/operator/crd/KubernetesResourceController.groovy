@@ -62,7 +62,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
 
     @Override
     void eventReceived(Action action, T resource) {
-        log.info "Event received: ${action}, kind: ${resource.kind}, name: ${resource.metadata.name}, apiVersion: ${resource.apiVersion}, "
+        log.info "${action}: name: ${resource.metadata.name}, kind: ${resource.kind}, apiVersion: ${resource.apiVersion}"
         if (resource.status == Status.Code.CONVERGED) {
             log.fine("${resource.metadata.name} has been already convered. Doing nothing...")
             return

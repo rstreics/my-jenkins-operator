@@ -38,7 +38,7 @@ class JenkinsHttpClient  {
     }
 
     String post(String uri, Map formBody = [:]) {
-        post(uri.toURI())
+        post(uri.toURI(), formBody)
     }
 
     String post(URI uri, Map formBody = [:]) {
