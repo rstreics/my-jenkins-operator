@@ -47,17 +47,18 @@ class Main {
 
         def rateLimiter = new RateLimiter()
         def jenkinsClient = new JenkinsHttpClient(jenkinsUrl, jenkinsUsername, jenkinsPassword)
-        def kubernetesClient = new DefaultKubernetesClient()
+        def kubernetesClient = new DefaultKubernetesClient().inNamespace(namespace) as DefaultKubernetesClient
+        def controller = new KubernetesResourceController(
+                kubernetes: kubernetesClient,
+                queue: rateLimiter,
+                jenkins: jenkinsClient
+            )
+
         log.info "Connecting to server: ${jenkinsUrl}"
-        log.info "Connected to Jenkins v${jenkinsClient.ping()}"
-
-        KubernetesResourceController controller = new KubernetesResourceController(
-            kubernetes: kubernetesClient,
-            queue: rateLimiter,
-            jenkins: jenkinsClient)
-
+//        log.info "Connected to Jenkins v${jenkinsClient.ping()}"
         log.info "Connecting to Kubernetes: ${kubernetesClient.masterUrl}, namespace: ${kubernetesClient.namespace}"
-        log.info "Connected: ${kubernetesClient.http}"
+        kubernetesClient.rootPaths()
+        log.info "Connected"
         def pipe = new Pipeline()
         controller.apply(pipe.definition)
         controller.watch(pipe)

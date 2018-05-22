@@ -65,7 +65,7 @@ trait ScriptableResource implements HasMetadata, Status {
     }
 
     def sendScript(String script, JenkinsHttpClient jenkins) {
-        def resp = jenkins.post('script', ['script': script])
+        def resp = jenkins.post('script', ['scriptText': script])
         if (!(resp =~ MAGIC_STRING)) {
             throw new RuntimeException("""Internal error during processing script
                                           [code: ${resp.code()}, text: ${text}]

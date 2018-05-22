@@ -5,7 +5,7 @@ trait Status {
   abstract Map getSpec()
 
   Code getStatus() {
-    String code = this.status?.code
+    String code = spec.status?.code
     return code ? Code.valueOf( code.toUpperCase() ) : Code.UNDEFINED
   }
 
