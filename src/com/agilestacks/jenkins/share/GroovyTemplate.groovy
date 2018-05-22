@@ -1,8 +1,6 @@
 #!/usr/bin/env groovy
 package com.agilestacks.jenkins.share
 
-import groovy.util.ConfigSlurper
-import java.util.Properties
 import groovy.text.*
 
 

@@ -6,26 +6,27 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient
 import io.fabric8.kubernetes.client.KubernetesClientException
 import io.fabric8.kubernetes.client.Watcher
 import io.fabric8.kubernetes.client.dsl.base.OperationSupport
+import io.fabric8.kubernetes.client.dsl.internal.CustomResourceDefinitionOperationsImpl
 import okhttp3.Request
 import okhttp3.RequestBody
 
 import java.util.logging.Logger
 
 class KubernetesResourceController<T extends ScriptableResource> implements Watcher<T> {
-    static final log = Logger.getLogger(KubernetesResourceController.name)
+    final log = Logger.getLogger(this.class.name)
 
     DefaultKubernetesClient kubernetes
     RateLimiter queue
     JenkinsHttpClient jenkins
 
     def getCrd() {
-        return kubernetes.customResourceDefinitions() as OperationSupport
+        return kubernetes.customResourceDefinitions() as CustomResourceDefinitionOperationsImpl
     }
 
     def apply(ScriptableResource.Definition definition) {
         def name = definition.metadata.name
 
-        def existing = crdOperations().list().items.find{ name == it.metadata.name }
+        def existing = crd.list().items.find{ name == it.metadata.name }
         if (existing) {
             log.info("${name} already exists")
             return
@@ -46,7 +47,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
     def watch(ScriptableResource resource) {
         String name = resource.definition.metadata.name
 
-        def existing = crdOperations().list().items
+        def existing = crd.list().items
         if (!existing) {
             throw new RuntimeException("Cannot push CRD ${name}")
         }

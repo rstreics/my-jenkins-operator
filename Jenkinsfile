@@ -25,7 +25,7 @@ pipeline {
       steps {
         container('buildbox') {
           sh script: './gradlew compileGroovy'
-          sh script: './gradlew cleanTest test'
+          sh script: './gradlew cleanTest test codenarcMain'
         }
       }
     }
@@ -43,6 +43,13 @@ pipeline {
                   reportDir            : 'build/reports/tests/test',
                   reportFiles          : 'index.html',
                   reportName           : 'Spock',])
+      publishHTML(target: [
+                  allowMissing         : true,
+                  alwaysLinkToLastBuild: false,
+                  keepAll              : true,
+                  reportDir            : 'build/reports/codenarc',
+                  reportFiles          : 'main.html',
+                  reportName           : 'Lint',])
       // publishHTML(target: [
       //             allowMissing         : true,
       //             alwaysLinkToLastBuild: false,

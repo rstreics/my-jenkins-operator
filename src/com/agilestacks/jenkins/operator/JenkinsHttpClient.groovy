@@ -12,7 +12,7 @@ import okhttp3.Route
 import java.util.logging.Logger
 
 class JenkinsHttpClient  {
-    static final log = Logger.getLogger(JenkinsHttpClient.name)
+    final log = Logger.getLogger(this.class.name)
 
     HttpUrl masterUrl = HttpUrl.parse('http://localhost:8080')
 

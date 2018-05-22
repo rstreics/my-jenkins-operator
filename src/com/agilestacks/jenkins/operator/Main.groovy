@@ -1,14 +1,13 @@
 package com.agilestacks.jenkins.operator
 
 import com.agilestacks.jenkins.operator.crd.KubernetesResourceController
-import com.agilestacks.jenkins.operator.crd.ScriptableResource
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
 
 import java.util.logging.Logger
 
 class Main {
 
-    static final log = Logger.getLogger(Main.name)
+    final log = Logger.getLogger(this.class.name)
 
     static final private String DEFAULT_NAMESPACE = 'jenkins'
     static final def OPTS = [:]
