@@ -28,6 +28,10 @@ spec:
               type: string
             folder:
               type: string
+            startBuild:
+              type: boolean
+            origin:
+              type: string
             status:
               type: object
               properties:

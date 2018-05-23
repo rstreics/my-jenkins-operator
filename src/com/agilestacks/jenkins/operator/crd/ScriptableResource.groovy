@@ -18,7 +18,10 @@ import org.slf4j.LoggerFactory
 @JsonDeserialize(using = JsonDeserializer.None.class)
 trait ScriptableResource implements HasMetadata, Status {
 
+    final log = java.util.logging.Logger.getLogger(this.class.name)
+
     static final MAGIC_STRING = /(?i)\s*Status\s*:\s+CONVERGED\s*<EOF>\s*/
+    static final EXCEPTION = /\.\w*Exception:/
 
     Map<String, ?> spec = [:]
 
@@ -55,13 +58,18 @@ trait ScriptableResource implements HasMetadata, Status {
 
     def sendScript(String script, JenkinsHttpClient jenkins) {
         def resp = jenkins.post('scriptText', ['script': script])
+        if (resp =~ EXCEPTION) {
+            log.severe("Error from ${jenkins.masterUrl.toString()}:\n${resp}")
+        } else {
+            log.info("Script output form ${jenkins.masterUrl.toString()}:\n${resp}")
+        }
         if (!(resp =~ MAGIC_STRING)) {
             throw new RuntimeException("Internal error during processing script:\n${resp}".stripIndent().trim())
         }
         resp
     }
 
-    def Map toMap() {
+    Map toMap() {
         ['kind': kind,
          'apiVersion': apiVersion,
          'spec': spec,

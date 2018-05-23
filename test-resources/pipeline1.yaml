@@ -2,6 +2,7 @@
 apiVersion: "jenkins.agilestacks.com/v1"
 kind: Pipeline
 metadata:
-  name: nodejs-sample-app
+  name: nodejs-app
 spec:
   repositoryUrl: "https://github.com/agilestacks/agile-demo.git"
+  folder: sample-pipelines
