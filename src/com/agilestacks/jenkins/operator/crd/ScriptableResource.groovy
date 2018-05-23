@@ -59,7 +59,7 @@ trait ScriptableResource implements HasMetadata, Status {
     def sendScript(String script, JenkinsHttpClient jenkins) {
         def resp = jenkins.post('scriptText', ['script': script])
         if (resp =~ EXCEPTION) {
-            log.severe("Error from ${jenkins.masterUrl.toString()}:\n${resp}")
+            log.severe("Error from ${jenkins.masterUrl.toString()}\n${resp}")
         } else {
             log.info("Script output form ${jenkins.masterUrl.toString()}:\n${resp}")
         }

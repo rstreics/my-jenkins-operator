@@ -55,7 +55,7 @@ class Main {
             )
 
         log.info "Connecting to server: ${jenkinsUrl}"
-//        log.info "Connected to Jenkins v${jenkinsClient.ping()}"
+        log.info "Connected to Jenkins v${jenkinsClient.ping()}"
         log.info "Connecting to Kubernetes: ${kubernetesClient.masterUrl}, namespace: ${kubernetesClient.namespace}"
         kubernetesClient.rootPaths()
         log.info "Connected"

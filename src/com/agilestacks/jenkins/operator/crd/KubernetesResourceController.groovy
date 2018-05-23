@@ -69,11 +69,14 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         }
         if (action == Action.ADDED) {
             queue.enqueue {
+                log.info "Proceed with ${resource.metadata.name} creation"
                 resource.create(jenkins)
                 resource.status = Status.Code.CONVERGED
             }
         } else if (action == Action.DELETED) {
+            log.info "Proceed with ${resource.metadata.name} deletion"
             queue.enqueue {
+                log.info "Proceed with ${resource.metadata.name} deletion"
                 resource.delete(jenkins)
                 resource.status = Status.Code.CONVERGED
             }
@@ -84,6 +87,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
                 resource.status = Status.Code.CONVERGED
             }
         } else {
+            log.severe("Unsupported action ${action} for ${resource.metadata.name}")
             throw new UnsupportedOperationException("Operation ${action} not yet supported")
         }
     }
