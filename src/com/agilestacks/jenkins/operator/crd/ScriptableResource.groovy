@@ -53,7 +53,7 @@ trait ScriptableResource implements HasMetadata, Status {
     }
 
     def delete(JenkinsHttpClient jenkins) {
-        sendScript(createScript, jenkins)
+        sendScript(deleteScript, jenkins)
     }
 
     def sendScript(String script, JenkinsHttpClient jenkins) {

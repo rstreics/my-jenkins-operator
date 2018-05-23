@@ -9,8 +9,9 @@ trait Status {
     return code ? Code.valueOf( code.toUpperCase() ) : Code.UNDEFINED
   }
 
-  void setStatus(Code code) {
-    spec.status.code = code
+  void setStatus(Code c) {
+      spec.status = spec.status ?: [:]
+      spec.status.code = c
   }
 
   static enum Code {
