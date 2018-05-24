@@ -16,13 +16,16 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 @JsonDeserialize(using = JsonDeserializer.None.class)
-trait ScriptableResource implements HasMetadata, Status {
+trait ScriptableResource implements HasMetadata {
 
     final log = java.util.logging.Logger.getLogger(this.class.name)
 
     static final MAGIC_STRING = /(?i)\s*Status\s*:\s+CONVERGED\s*<EOF>\s*/
     static final EXCEPTION = /\.\w*Exception:/
 
+    Map<String, ?> defaults = [:]
+
+    @JsonProperty("spec")
     Map<String, ?> spec = [:]
 
     abstract String getDefinitionFile()
@@ -43,9 +46,11 @@ trait ScriptableResource implements HasMetadata, Status {
         return definition.metadata.name
     }
 
-    @JsonProperty("spec")
-    void setSpec(Map newSpec) {
-        this.spec << newSpec
+    Map<String, ?> getSpec() {
+        def result = [:]
+        result.putAll( defaults ?: [:] )
+        result.putAll( spec ?: [:] )
+        result
     }
 
     def create(JenkinsHttpClient jenkins) {
@@ -69,7 +74,7 @@ trait ScriptableResource implements HasMetadata, Status {
         resp
     }
 
-    Map toMap() {
+    Map<String, ?> getScriptParameters() {
         ['kind': kind,
          'apiVersion': apiVersion,
          'spec': spec,
@@ -83,7 +88,7 @@ trait ScriptableResource implements HasMetadata, Status {
 
     String formatGroovyScript(String text) {
         def templater = new StringReplace()
-        def rendered = templater.mustache(text, this.toMap())
+        def rendered = templater.mustache(text, this.scriptParameters)
         templater.eraseMustache(rendered)
     }
 

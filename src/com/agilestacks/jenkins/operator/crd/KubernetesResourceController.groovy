@@ -10,6 +10,7 @@ import io.fabric8.kubernetes.client.dsl.internal.CustomResourceDefinitionOperati
 import okhttp3.Request
 import okhttp3.RequestBody
 
+import java.lang.reflect.Constructor
 import java.util.logging.Logger
 
 class KubernetesResourceController<T extends ScriptableResource> implements Watcher<T> {
@@ -23,6 +24,11 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         return kubernetes.customResourceDefinitions() as CustomResourceDefinitionOperationsImpl
     }
 
+    def apply(Class<T> clazz) {
+        Constructor constructor = clazz.constructors.first()
+        def rsc = constructor.newInstance() as T
+        apply( rsc.definition )
+    }
 
     def apply(ScriptableResource.Definition definition) {
         def name = definition.metadata.name
@@ -45,6 +51,12 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         }
     }
 
+    def watch(Class<T> clazz) {
+        Constructor constructor = clazz.constructors.first()
+        def rsc = constructor.newInstance() as T
+        watch( rsc )
+    }
+
     def watch(ScriptableResource resource) {
         String name = resource.definition.metadata.name
 
@@ -63,28 +75,26 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
     @Override
     void eventReceived(Action action, T resource) {
         log.info "${action}: name: ${resource.metadata.name}, kind: ${resource.kind}, apiVersion: ${resource.apiVersion}"
-        if (resource.status == Status.Code.CONVERGED) {
-            log.fine("${resource.metadata.name} has been already convered. Doing nothing...")
-            return
-        }
+//        if (resource.status == Status.Code.CONVERGED) {
+//            log.fine("${resource.metadata.name} has been already convered. Doing nothing...")
+//            return
+//        }
         if (action == Action.ADDED) {
             queue.enqueue {
                 log.info "Proceed with ${resource.metadata.name} creation"
                 resource.create(jenkins)
-                resource.status = Status.Code.CONVERGED
             }
         } else if (action == Action.DELETED) {
             log.info "Proceed with ${resource.metadata.name} deletion"
             queue.enqueue {
                 log.info "Proceed with ${resource.metadata.name} deletion"
                 resource.delete(jenkins)
-                resource.status = Status.Code.CONVERGED
             }
         } else if (action == Action.MODIFIED) {
             queue.enqueue {
+                log.info "Proceed with ${resource.metadata.name} update"
                 resource.delete(jenkins)
                 resource.create(jenkins)
-                resource.status = Status.Code.CONVERGED
             }
         } else {
             log.severe("Unsupported action ${action} for ${resource.metadata.name}")
