@@ -7,7 +7,6 @@ import java.util.logging.Logger
 
 class Main {
     static final private String DEFAULT_NAMESPACE = 'jenkins'
-    static final def OPTS = [:]
 
     static def fromNamespaceFile(File file = new File('/run/secrets/kubernetes.io/serviceaccount/namespace')) {
         return file.exists() ? file.text.trim() : null
@@ -59,9 +58,13 @@ class Main {
         log.info "Connecting to Kubernetes: ${kubernetesClient.masterUrl}, namespace: ${kubernetesClient.namespace}"
         kubernetesClient.rootPaths()
         log.info "Connected"
-        def pipe = new Pipeline()
-        controller.apply(pipe.definition)
-        controller.watch(pipe)
+
+        controller.apply(Pipeline)
+        controller.watch(Pipeline)
+
+        controller.apply(EnvVars)
+        controller.watch(EnvVars)
+
         rateLimiter.startAtFixedRate()
     }
 }

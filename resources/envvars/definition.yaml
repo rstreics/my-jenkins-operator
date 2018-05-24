@@ -1,23 +1,25 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: vars.jenkins.agilestacks.com
+  name: envvars.jenkins.agilestacks.com
 spec:
   group: jenkins.agilestacks.com
   version: v1
   scope: Namespaced
   names:
-    plural: vars
-    singular: var
-    kind: Variable
-    shortNames: [vars]
+    plural: envvars
+    singular: envvar
+    kind: EnvVar
+    shortNames: [envvars, var, vars]
   validation:
     openAPIV3Schema:
       type: object
       properties:
         spec:
-          type: object
           properties:
+            merge:
+              type: String
+              pattern: '(ours|their)'
             variables:
               type: object
               properties: {}

@@ -15,9 +15,9 @@ class CustomResourceSpec extends Specification {
             rsc.deleteScript =~ MAGIC_STRING
     }
 
-    def "vars custom resource scripts has magic string"() {
+    def "envvars custom resource scripts has magic string"() {
         given:
-            def rsc = new Variables()
+            def rsc = new EnvVars()
         expect:
             hasDefinitionAndScripts(rsc)
             rsc.createScript =~ MAGIC_STRING

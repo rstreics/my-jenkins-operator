@@ -1,0 +1,8 @@
+---
+apiVersion: "jenkins.agilestacks.com/v1"
+kind: EnvVars
+metadata:
+  name: test
+spec:
+  GITHUB_URL: "https://github.com/agilestacks/agile-demo.git"
+  FOLDER_NAME: sample-pipelines

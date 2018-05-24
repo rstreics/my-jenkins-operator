@@ -16,6 +16,8 @@ spec:
       properties:
         spec:
           type: object
+          required:
+          - repositoryUrl
           properties:
             repositoryUrl:
               type: string
