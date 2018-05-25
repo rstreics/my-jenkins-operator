@@ -25,7 +25,6 @@ trait ScriptableResource implements HasMetadata {
 
     Map<String, ?> defaults = [:]
 
-    @JsonProperty("spec")
     Map<String, ?> spec = [:]
 
     abstract String getDefinitionFile()
@@ -53,6 +52,11 @@ trait ScriptableResource implements HasMetadata {
         result
     }
 
+    @JsonProperty("spec")
+    void setSpec(Map<String, ?> newSpec) {
+        this.spec.putAll(newSpec)
+    }
+
     def create(JenkinsHttpClient jenkins) {
         sendScript(createScript, jenkins)
     }
@@ -75,10 +79,10 @@ trait ScriptableResource implements HasMetadata {
     }
 
     Map<String, ?> getScriptParameters() {
-        ['kind': kind,
-         'apiVersion': apiVersion,
-         'spec': spec,
-         'metadata': metadata.properties]
+        [kind: kind,
+         apiVersion: apiVersion,
+         spec: spec,
+         metadata: metadata.properties]
     }
 
     String formatGroovyScriptFromClasspath(String filename) {
@@ -88,7 +92,7 @@ trait ScriptableResource implements HasMetadata {
 
     String formatGroovyScript(String text) {
         def templater = new StringReplace()
-        def rendered = templater.mustache(text, this.scriptParameters)
+        def rendered = templater.mustache(text, scriptParameters)
         templater.eraseMustache(rendered)
     }
 
@@ -122,10 +126,10 @@ trait ScriptableResource implements HasMetadata {
     }
 
     static class Done implements Doneable {
-        private static final Logger logger = LoggerFactory.getLogger(Done)
+        private static final Logger log = LoggerFactory.getLogger(Done)
 
         Object done() {
-            logger.error('Method done() is not implemented yet')
+            log.error('Method done() is not implemented yet')
             return null
         }
     }

@@ -35,10 +35,10 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
 
         def existing = crd.list().items.find{ name == it.metadata.name }
         if (existing) {
-            log.info("${name} already exists")
+            log.info("Found: ${name}")
             return
         }
-        log.info("Creating custom resource definition: ${name}")
+        log.info("Creating: ${name}")
         def request = new Request.Builder()
                 .post(RequestBody.create( OperationSupport.JSON, definition.toJsonString() ))
                 .url(crd.resourceUrl)

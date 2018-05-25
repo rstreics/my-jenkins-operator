@@ -5,25 +5,22 @@ import jenkins.model.*
 import java.util.logging.Logger
 import java.io.*
 
-def vars = """\
-{{specAsProperties}}
+def VARS = """\
+{{specPropertiesBase64}}
 """
 
+def MERGE = '{{spec.merge}}' ?: 'ours'
+
 def props = new Properties()
-props.load(new StringReader( vars ))
+props.load(new StringReader( new String(VARS.decodeBase64()).trim() ))
 
 def jenk = Jenkins.get()
-def globalProps = jenk.globalNodeProperties
 
-def envVarsNodePropertyList = globalProps?.envVars
-
-def envVars
-if (envVarsNodePropertyList == null || envVarsNodePropertyList.empty) {
+def envVars = jenk.globalNodeProperties.envVars?.get(0)
+if (!envVars) {
     def envVarProps = new EnvironmentVariablesNodeProperty()
-    globalProps.add( envVarProps )
+    jenk.globalNodeProperties.add( envVarProps )
     envVars = envVarProps.envVars
-} else {
-    envVars = envVarsNodePropertyList.first
 }
 
 props.each {k,v ->

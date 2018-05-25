@@ -10,11 +10,12 @@ class EnvVars extends CustomResource implements ScriptableResource, Status {
     final String deleteScriptFile = '/envvars/delete.groovy'
 
     Map<String, ?> defaults = [ merge: 'ours' ]
+    @Lazy
     Map<String, ?> scriptParameters = [kind          : kind,
                                        apiVersion    : apiVersion,
-                                       spec          : spec,
+                                       spec          : getSpec(),
                                        metadata      : metadata.properties,
-                                       specProperties: toPropertiesString()]
+                                       specPropertiesBase64: toPropertiesString().bytes.encodeBase64()]
 
     def toPropertiesString() {
         def props = new Properties(spec)

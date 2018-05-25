@@ -9,7 +9,7 @@ spec:
   names:
     plural: envvars
     singular: envvar
-    kind: EnvVar
+    kind: EnvVars
     shortNames: [envvars, var, vars]
   validation:
     openAPIV3Schema:
