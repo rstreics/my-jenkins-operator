@@ -31,8 +31,20 @@ pipeline {
     stage('Test') {
       steps {
         container('buildbox') {
-          sh script: './gradlew cleanTest test'
-          sh script: './gradlew codenarcMain'
+          script {
+            try {
+              sh script: './gradlew codenarcMain'
+            } catch (err) {
+              currentBuild.result = 'UNSTABLE'
+              currentBuild.description = 'CodeNarc violations found'
+            }
+
+            try {
+              sh script: './gradlew cleanTest test'
+            } catch (err) {
+              error 'Some of unit tests failed'
+            }
+          }
         }
       }
     }
