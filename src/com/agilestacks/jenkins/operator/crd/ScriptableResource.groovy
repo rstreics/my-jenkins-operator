@@ -12,18 +12,14 @@ import io.fabric8.kubernetes.api.model.KubernetesResourceList
 import io.fabric8.kubernetes.api.model.ListMeta
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
 import io.fabric8.kubernetes.client.utils.Serialization
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 @JsonDeserialize(using = JsonDeserializer.None.class)
 trait ScriptableResource implements HasMetadata {
-
-    final log = java.util.logging.Logger.getLogger(this.class.name)
+    static final log = LoggerFactory.getLogger(Done)
 
     static final MAGIC_STRING = /(?i)\s*Status\s*:\s+CONVERGED\s*<EOF>\s*/
     static final EXCEPTION = /\.\w*Exception:/
-
-    Map<String, ?> defaults = [:]
 
     Map<String, ?> spec = [:]
 
@@ -46,10 +42,7 @@ trait ScriptableResource implements HasMetadata {
     }
 
     Map<String, ?> getSpec() {
-        def result = [:]
-        result.putAll( defaults ?: [:] )
-        result.putAll( spec ?: [:] )
-        result
+        spec
     }
 
     @JsonProperty("spec")
@@ -126,7 +119,7 @@ trait ScriptableResource implements HasMetadata {
     }
 
     static class Done implements Doneable {
-        private static final Logger log = LoggerFactory.getLogger(Done)
+        static final log = LoggerFactory.getLogger(Done)
 
         Object done() {
             log.error('Method done() is not implemented yet')
