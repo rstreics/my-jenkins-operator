@@ -1,0 +1,10 @@
+target/
+build/
+.allure/
+.DS_Store
+.editorconfig
+.envrc
+.git/
+.gradle/
+.idea/
+out/

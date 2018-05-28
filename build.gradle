@@ -9,6 +9,7 @@ buildscript {
   }
   dependencies {
     classpath "io.qameta.allure:allure-gradle:2.5"
+    classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
   }
 }
 
@@ -19,6 +20,7 @@ apply plugin: 'application'
 apply plugin: 'java-library'
 apply plugin: 'maven'
 apply plugin: 'codenarc'
+apply plugin: 'com.github.johnrengelman.shadow'
 //apply plugin: 'io.qameta.allure'
 
 ext {
@@ -56,6 +58,10 @@ sourceSets {
             srcDirs = ['test-resources']
         }
     }
+}
+
+shadowJar {
+    archiveName 'jenkins-operator.jar'
 }
 
 repositories {
