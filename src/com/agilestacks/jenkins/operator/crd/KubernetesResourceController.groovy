@@ -46,7 +46,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         def resp = kubernetes.httpClient.newCall(request).execute()
 
         log.finest("Response: [${resp.toString()}]")
-        if (resp.code() > 400) {
+        if (resp.code() >= 400) {
             throw new RuntimeException("Unable to create CRD [resp: ${resp.code()}, text: ${resp.body().string()}]")
         }
     }
@@ -75,26 +75,25 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
     @Override
     void eventReceived(Action action, T resource) {
         log.info "${action}: name: ${resource.metadata.name}, kind: ${resource.kind}, apiVersion: ${resource.apiVersion}"
-//        if (resource.status == Status.Code.CONVERGED) {
-//            log.fine("${resource.metadata.name} has been already convered. Doing nothing...")
-//            return
-//        }
         if (action == Action.ADDED) {
             queue.enqueue {
-                log.info "Proceed with ${resource.metadata.name} creation"
-                resource.create(jenkins)
+                log.info "Proceed with ${resource.metadata.name}@${resource.apiVersion} creation"
+                resource.create(jenkins, kubernetes)
+                log.info "${resource.metadata.name}@${resource.apiVersion}: done"
             }
         } else if (action == Action.DELETED) {
-            log.info "Proceed with ${resource.metadata.name} deletion"
+            log.info "Proceed with ${resource.metadata.name}@${resource.apiVersion} deletion"
             queue.enqueue {
                 log.info "Proceed with ${resource.metadata.name} deletion"
-                resource.delete(jenkins)
+                resource.delete(jenkins, kubernetes)
+                log.info "${resource.metadata.name}@${resource.apiVersion}: done"
             }
         } else if (action == Action.MODIFIED) {
             queue.enqueue {
-                log.info "Proceed with ${resource.metadata.name} update"
-                resource.delete(jenkins)
-                resource.create(jenkins)
+                log.info "Proceed with ${resource.metadata.name}@${resource.apiVersion} update"
+                resource.delete(jenkins, kubernetes)
+                resource.create(jenkins, kubernetes)
+                log.info "${resource.metadata.name}@${resource.apiVersion}: done"
             }
         } else {
             log.severe("Unsupported action ${action} for ${resource.metadata.name}")

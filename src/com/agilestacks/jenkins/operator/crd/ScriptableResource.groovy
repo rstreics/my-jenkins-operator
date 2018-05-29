@@ -11,6 +11,7 @@ import io.fabric8.kubernetes.api.model.HasMetadata
 import io.fabric8.kubernetes.api.model.KubernetesResourceList
 import io.fabric8.kubernetes.api.model.ListMeta
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
+import io.fabric8.kubernetes.client.KubernetesClient
 import io.fabric8.kubernetes.client.utils.Serialization
 import org.slf4j.LoggerFactory
 
@@ -21,6 +22,7 @@ trait ScriptableResource implements HasMetadata {
     static final MAGIC_STRING = /(?i)\s*Status\s*:\s+CONVERGED\s*<EOF>\s*/
     static final EXCEPTION = /\.\w*Exception:/
 
+    Map<String, ?> defaults = [:]
     Map<String, ?> spec = [:]
 
     abstract String getDefinitionFile()
@@ -41,27 +43,25 @@ trait ScriptableResource implements HasMetadata {
         return definition.metadata.name
     }
 
-    Map<String, ?> getSpec() {
-        spec
-    }
-
     @JsonProperty("spec")
     void setSpec(Map<String, ?> newSpec) {
         this.spec.putAll(newSpec)
     }
 
-    def create(JenkinsHttpClient jenkins) {
-        sendScript(createScript, jenkins)
+    def create(JenkinsHttpClient jenkins, KubernetesClient kubernetes=null) {
+        def text = getCreateScript()
+        sendScript(text, jenkins)
     }
 
-    def delete(JenkinsHttpClient jenkins) {
-        sendScript(deleteScript, jenkins)
+    def delete(JenkinsHttpClient jenkins, KubernetesClient kubernetes=null) {
+        def text = getDeleteScript()
+        sendScript(text, jenkins)
     }
 
     def sendScript(String script, JenkinsHttpClient jenkins) {
         def resp = jenkins.post('scriptText', ['script': script])
         if (resp =~ EXCEPTION) {
-            log.severe("Error from ${jenkins.masterUrl.toString()}\n${resp}")
+            log.error("Error from ${jenkins.masterUrl.toString()}\n${resp}")
         } else {
             log.info("Script output form ${jenkins.masterUrl.toString()}:\n${resp}")
         }
@@ -71,21 +71,22 @@ trait ScriptableResource implements HasMetadata {
         resp
     }
 
-    Map<String, ?> getScriptParameters() {
+    Map<String, ?> getMergedWithDefaults() {
         [kind: kind,
          apiVersion: apiVersion,
-         spec: spec,
+         spec: getDefaults() + getSpec(),
          metadata: metadata.properties]
     }
 
-    String formatGroovyScriptFromClasspath(String filename) {
+    String formatGroovyScriptFromClasspath(String filename, Map params=getMergedWithDefaults()) {
         String text = ScriptableResource.getResourceAsStream(filename).text
         formatGroovyScript(text)
     }
 
-    String formatGroovyScript(String text) {
+    String formatGroovyScript(String text, Map params=getMergedWithDefaults()) {
         def templater = new StringReplace()
-        def rendered = templater.mustache(text, scriptParameters)
+        log.info("Apply script parameters: ${params}")
+        def rendered = templater.mustache(text, params)
         templater.eraseMustache(rendered)
     }
 
