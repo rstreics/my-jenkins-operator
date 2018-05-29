@@ -13,14 +13,14 @@ class Credentials extends CustomResource implements ScriptableResource {
         Map secretRef
         if (spec.containsKey('usernamePassword')) {
             secretRef = spec.usernamePassword.password.secretKeyRef
-        } else if (spec.containsKey('usernamePassword')) {
+        } else if (spec.containsKey('secretString')) {
             secretRef = spec.secretString.secretKeyRef
         } else {
             throw new IllegalArgumentException( "Unsupported credentials type: ${this}" )
         }
 
         def params = mergedWithDefaults
-        params.secretText = kubernetes.
+        params.secret = kubernetes.
             secrets().
             withName(secretRef.name as String).
             get().

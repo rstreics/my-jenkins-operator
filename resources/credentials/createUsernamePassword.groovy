@@ -1,15 +1,12 @@
 package credentials
 
-import io.fabric8.kubernetes.client.ConfigBuilder
-import io.fabric8.kubernetes.client.DefaultKubernetesClient
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
 import com.cloudbees.plugins.credentials.CredentialsScope
 import com.cloudbees.plugins.credentials.domains.Domain
 
 def USERNAME    = '{{spec.usernamePassword.username}}' ?: null
-def SECRET_NAME = '{{spec.usernamePassword.password.secretKeyRef.name}}' ?: null
-def SECRET_KEY  = '{{spec.usernamePassword.password.secretKeyRef.key}}'?: null
+def PASSWORD    = new String('{{secret}}'.decodeBase64())
 def DESCRIPTION = '{{spec.description}}'?: null
 def DOMAIN      = '{{spec.domain}}' ?: null
 def CREDS_ID    = '{{spec.id}}' ?: '{{metadata.name}}' ?: null
@@ -33,14 +30,9 @@ if (DOMAIN != 'global') {
     println "Use global domain"
 }
 
-def client = new DefaultKubernetesClient(new ConfigBuilder().build())
-
-def secret = client.secrets().withName(SECRET_NAME).get()
-def password = new String( secret.data.get( SECRET_KEY ).decodeBase64() )
-
 List existing = domainCredsMap[domain] ?: []
 if ( !existing.find { it.id == CREDS_ID } ) {
-    def creds = new UsernamePasswordCredentialsImpl(scope, CREDS_ID, DESCRIPTION, USERNAME, password)
+    def creds = new UsernamePasswordCredentialsImpl(scope, CREDS_ID, DESCRIPTION, USERNAME, PASSWORD)
     SystemCredentialsProvider.instance.addCredentials(domain, creds)
 } else {
     println "Existing creds ${CREDS_ID} has been found... doing nothing"
