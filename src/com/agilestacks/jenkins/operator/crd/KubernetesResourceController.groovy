@@ -79,21 +79,21 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
             queue.enqueue {
                 log.info "Proceed with ${resource.metadata.name}@${resource.apiVersion} creation"
                 resource.create(jenkins, kubernetes)
-                log.info "${resource.metadata.name}@${resource.apiVersion}: done"
+                log.info "done"
             }
         } else if (action == Action.DELETED) {
             log.info "Proceed with ${resource.metadata.name}@${resource.apiVersion} deletion"
             queue.enqueue {
                 log.info "Proceed with ${resource.metadata.name} deletion"
                 resource.delete(jenkins, kubernetes)
-                log.info "${resource.metadata.name}@${resource.apiVersion}: done"
+                log.info "done"
             }
         } else if (action == Action.MODIFIED) {
             queue.enqueue {
                 log.info "Proceed with ${resource.metadata.name}@${resource.apiVersion} update"
                 resource.delete(jenkins, kubernetes)
-                resource.create(jenkins, kubernetes)
-                log.info "${resource.metadata.name}@${resource.apiVersion}: done"
+                resource.create(jenkins, )
+                log.info "done"
             }
         } else {
             log.severe("Unsupported action ${action} for ${resource.metadata.name}")
