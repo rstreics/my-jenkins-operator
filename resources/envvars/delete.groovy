@@ -6,10 +6,10 @@ import java.util.logging.Logger
 import java.io.*
 
 def VARS = """\
-{{specPropertiesBase64}}
+{{variablesBase64}}
 """
 
-def MERGE = '{{spec.merge}}' ?: 'ours'
+def MERGE = '{{spec.merge}}' ?: null
 
 def props = new Properties()
 props.load(new StringReader( new String(VARS.decodeBase64()).trim() ))

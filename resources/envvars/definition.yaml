@@ -18,16 +18,10 @@ spec:
         spec:
           properties:
             merge:
-              type: String
+              type: string
               pattern: '(ours|their)'
+#              default: 'ours'
             variables:
+              nullable: false
               type: object
               properties: {}
-            status:
-              type: object
-              properties:
-                code:
-                  type: string
-                  pattern: '(PENDING|CONVERGED|ERROR)'
-                message:
-                  type: string

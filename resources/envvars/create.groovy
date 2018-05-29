@@ -6,13 +6,13 @@ import java.util.logging.Logger
 import java.io.*
 
 def VARS = """\
-{{specPropertiesBase64}}
+{{variablesBase64}}
 """
 
-def MERGE = '{{spec.merge}}' ?: 'ours'
+def MERGE = '{{spec.merge}}' ?: null
 
 def props = new Properties()
-props.load(new StringReader( new String(VARS.decodeBase64()).trim() ))
+props.load(new StringReader( new String(VARS.decodeBase64()) ))
 
 def jenk = Jenkins.get()
 
@@ -27,10 +27,10 @@ if (MERGE == 'ours') {
     def onlyNew = props.findAll { k, v ->
         println "Processing variable ${k}: ${v}"
         !envVars.containsKey(k)
-    } as Map<? extends String, ? extends String>
+    } as Map
     envVars.putAll(onlyNew)
 } else if (MERGE == 'their') {
-    envVars.putAll(props.getProperties())
+    envVars.overrideAll( props as Map )
 } else {
     new RuntimeException("Unknown global Jenkins variables merge option: ${MERGE}")
 }

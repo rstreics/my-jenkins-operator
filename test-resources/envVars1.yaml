@@ -2,7 +2,9 @@
 apiVersion: "jenkins.agilestacks.com/v1"
 kind: EnvVars
 metadata:
-  name: test
+    name: test
 spec:
-  GITHUB_URL: "https://github.com/agilestacks/agile-demo.git"
-  FOLDER_NAME: sample-pipelines
+    merge: their
+    variables:
+        TEST_VARS_IMPORTANT_URL: "https://google.com"
+        TEST_VAR: hello, world!
