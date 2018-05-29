@@ -65,6 +65,9 @@ class Main {
         controller.apply(EnvVars)
         controller.watch(EnvVars)
 
+        controller.apply(Credentials)
+        controller.watch(Credentials)
+
         rateLimiter.startAtFixedRate()
     }
 }
