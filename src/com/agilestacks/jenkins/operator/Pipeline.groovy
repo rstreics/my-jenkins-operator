@@ -1,14 +1,14 @@
 package com.agilestacks.jenkins.operator
 
 import com.agilestacks.jenkins.operator.crd.ScriptableResource
-import com.agilestacks.jenkins.operator.crd.Status
 import io.fabric8.kubernetes.client.CustomResource
 
-class Pipeline extends CustomResource implements ScriptableResource, Status {
+class Pipeline extends CustomResource implements ScriptableResource {
     final String definitionFile = '/pipeline/definition.yaml'
     final String createScriptFile = '/pipeline/create.groovy'
     final String deleteScriptFile = '/pipeline/delete.groovy'
 
+    @Lazy
     Map<String, ?> defaults = [
         branchSpec: '*/master',
         pipeline  : 'Jenkinsfile',

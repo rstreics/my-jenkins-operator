@@ -10,12 +10,12 @@ import com.cloudbees.hudson.plugins.folder.*
 
 final NAME           = '{{metadata.name}}' ?: null
 final URL            = '{{spec.repositoryUrl}}' ?: null
-final BRANCH_SPEC    = '{{spec.branchSpec}}' ?: '*/master'
-final JENKINSFILE    = '{{spec.pipeline}}' ?: 'Jenkinsfile'
+final BRANCH_SPEC    = '{{spec.branchSpec}}' ?: null
+final JENKINSFILE    = '{{spec.pipeline}}' ?: null
 final CREDENTIALS_ID = '{{spec.credentialsId}}' ?: null
 final FOLDER         = '{{spec.folder}}' ?: null
-final START_BUILD    = '{{spec.startBuild}}' ?: true
-final ORIGIN         = '{{spec.origin}}' ?: 'agilestacks.io'
+final START_BUILD    = '{{spec.startBuild}}'.toBoolean()
+final ORIGIN         = '{{spec.origin}}' ?: null
 
 def folderName(def folder) {
     if (folder.getParent() instanceof Jenkins) {

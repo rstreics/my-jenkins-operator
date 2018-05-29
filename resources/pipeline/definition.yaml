@@ -22,23 +22,22 @@ spec:
             repositoryUrl:
               type: string
               pattern: '(https?)(:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)'
+              nullable: false
             branchSpec:
               type: string
+#              default: '*/master'
             pipeline:
               type: string
+#              default: 'Jenkinsfile'
             credentialsId:
               type: string
+              nullable: true
             folder:
               type: string
+              nullable: true
             startBuild:
               type: boolean
+#              default: true
             origin:
               type: string
-            status:
-              type: object
-              properties:
-                code:
-                  type: string
-                  pattern: '(PENDING|CONVERGED|ERROR|UNDEFINED)'
-                message:
-                  type: string
+#              default: 'superhub.io'
