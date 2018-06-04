@@ -1,5 +1,6 @@
 package com.agilestacks.jenkins.operator
 
+import groovy.util.logging.Log
 import okhttp3.Authenticator
 import okhttp3.Credentials
 import okhttp3.FormBody
@@ -9,10 +10,8 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 
-import java.util.logging.Logger
-
+@Log
 class JenkinsHttpClient  {
-    final log = Logger.getLogger(this.class.name)
 
     HttpUrl masterUrl = HttpUrl.parse('http://localhost:8080')
 
@@ -58,12 +57,16 @@ class JenkinsHttpClient  {
             .build()
 
         def resp = newClient().newCall(request).execute()
-        if (resp.code() >= 400) {
-            throw new ConnectException("""Unable to ${request.method()} ${request.url().toString()} 
+        try {
+            if (!resp.successful) {
+                throw new ConnectException("""Unable to ${request.method()} ${request.url().toString()}
                                           got response [code: ${resp.code()}, text: ${resp.body().string()}]
                                        """.stripIndent().trim())
+            }
+            return resp.body().string()
+        } finally {
+            resp.close()
         }
-        return resp.body().string()
     }
 
     def ping() {
@@ -73,12 +76,16 @@ class JenkinsHttpClient  {
                         .build()
         log.finer("Calling http ${request}")
         def resp = newClient().newCall(request).execute()
-        if (resp.code() >= 400) {
-            throw new ConnectException("""Unable to ${request.method()} ${request.url().toString()} 
+        try {
+            if (!resp.successful) {
+                throw new ConnectException("""Unable to ${request.method()} ${request.url().toString()}
                                           got response [code: ${resp.code()}, text: ${resp.body().string()}]
                                        """.stripIndent().trim())
+            }
+            return resp.header('X-Jenkins') ?: 'Unknown'
+        }finally {
+            resp.close()
         }
-        return resp.header('X-Jenkins') ?:  'Unknown'
     }
 
     private static HttpUrl toHttpUrl(String url, String username=null, String password=null) {

@@ -8,7 +8,6 @@ class Pipeline extends CustomResource implements ScriptableResource {
     final String createScriptFile = '/pipeline/create.groovy'
     final String deleteScriptFile = '/pipeline/delete.groovy'
 
-    @Lazy
     Map<String, ?> defaults = [
         branchSpec: '*/master',
         pipeline  : 'Jenkinsfile',

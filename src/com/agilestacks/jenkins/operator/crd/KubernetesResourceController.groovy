@@ -92,7 +92,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
             queue.enqueue {
                 log.info "Proceed with ${resource.metadata.name}@${resource.apiVersion} update"
                 resource.delete(jenkins, kubernetes)
-                resource.create(jenkins, )
+                resource.create(jenkins, kubernetes)
                 log.info "done"
             }
         } else {

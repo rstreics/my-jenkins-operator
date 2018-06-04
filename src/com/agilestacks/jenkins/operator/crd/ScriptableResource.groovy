@@ -6,6 +6,7 @@ import com.agilestacks.jenkins.share.StringReplace
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import groovy.util.logging.Log
 import io.fabric8.kubernetes.api.model.Doneable
 import io.fabric8.kubernetes.api.model.HasMetadata
 import io.fabric8.kubernetes.api.model.KubernetesResourceList
@@ -13,11 +14,10 @@ import io.fabric8.kubernetes.api.model.ListMeta
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
 import io.fabric8.kubernetes.client.KubernetesClient
 import io.fabric8.kubernetes.client.utils.Serialization
-import org.slf4j.LoggerFactory
 
+@Log
 @JsonDeserialize(using = JsonDeserializer.None.class)
 trait ScriptableResource implements HasMetadata {
-    static final log = LoggerFactory.getLogger(Done)
 
     static final MAGIC_STRING = /(?i)\s*Status\s*:\s+CONVERGED\s*<EOF>\s*/
     static final EXCEPTION = /\.\w*Exception:/
@@ -61,7 +61,7 @@ trait ScriptableResource implements HasMetadata {
     def sendScript(String script, JenkinsHttpClient jenkins) {
         def resp = jenkins.post('scriptText', ['script': script])
         if (resp =~ EXCEPTION) {
-            log.error("Error from ${jenkins.masterUrl.toString()}\n${resp}")
+            log.severe("Error from ${jenkins.masterUrl.toString()}\n${resp}")
         } else {
             log.info("Script output form ${jenkins.masterUrl.toString()}:\n${resp}")
         }
@@ -90,6 +90,7 @@ trait ScriptableResource implements HasMetadata {
         templater.eraseMustache(rendered)
     }
 
+    @Log
     static class Definition extends CustomResourceDefinition implements Props {
 
         static Definition fromClasspath(String cpRef) {
@@ -109,6 +110,7 @@ trait ScriptableResource implements HasMetadata {
         }
     }
 
+    @Log
     static class List<T extends ScriptableResource> implements KubernetesResourceList<T>, Props {
         ListMeta getMetadata() {
             model.metadata
@@ -119,9 +121,8 @@ trait ScriptableResource implements HasMetadata {
         }
     }
 
+    @Log
     static class Done implements Doneable {
-        static final log = LoggerFactory.getLogger(Done)
-
         Object done() {
             log.error('Method done() is not implemented yet')
             return null
