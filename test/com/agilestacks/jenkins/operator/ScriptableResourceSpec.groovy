@@ -2,6 +2,7 @@ package com.agilestacks.jenkins.operator
 
 import com.agilestacks.jenkins.operator.crd.ScriptableResource
 import com.agilestacks.jenkins.share.StringReplace
+import groovy.util.logging.Log
 import io.fabric8.kubernetes.client.CustomResource
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -81,7 +82,7 @@ class ScriptableResourceSpec extends Specification {
             !(result =~ StringReplace.MUSTACHE)
     }
 
-
+    @Log
     class DummyCustomResource extends CustomResource implements ScriptableResource {
         String definitionFile = '/pipeline/definition.yaml'
         String createScriptFile = '/scriptableresource/create.groovy'

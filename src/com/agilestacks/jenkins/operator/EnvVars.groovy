@@ -1,8 +1,10 @@
 package com.agilestacks.jenkins.operator
 
+import groovy.util.logging.Log
 import com.agilestacks.jenkins.operator.crd.ScriptableResource
 import io.fabric8.kubernetes.client.CustomResource
 
+@Log
 class EnvVars extends CustomResource implements ScriptableResource {
     final String definitionFile   = '/envvars/definition.yaml'
     final String createScriptFile = '/envvars/create.groovy'
