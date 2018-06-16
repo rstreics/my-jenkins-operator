@@ -16,8 +16,8 @@ class ScriptableResourceSpec extends Specification {
 
     def "can render script from classpath"() {
         given:
-            def resource1 = new DummyCustomResource()
-            def resource2 = new DummyCustomResource()
+            def resource1 = new Dummy()
+            def resource2 = new Dummy()
         when:
             resource1.metadata.name = 'Dummy'
             resource2.metadata.name = 'Stubby'
@@ -30,7 +30,7 @@ class ScriptableResourceSpec extends Specification {
 
     def "can submit create and delete scripts to Jenkins"() {
         given:
-            def resource = new DummyCustomResource()
+            def resource = new Dummy()
             server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${MAGIC_STRING}'"))
             server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${MAGIC_STRING}'"))
         when:
@@ -45,7 +45,7 @@ class ScriptableResourceSpec extends Specification {
 
     def "send script should work if script contains a magic string"() {
         given:
-            def resource = new DummyCustomResource()
+            def resource = new Dummy()
             server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${MAGIC_STRING}'"))
         when:
             def result = resource.sendScript(resource.createScript, client)
@@ -55,7 +55,7 @@ class ScriptableResourceSpec extends Specification {
 
     def "send script should throw exception if invalid magic string"() {
         given:
-            def resource = new DummyCustomResource()
+            def resource = new Dummy()
             server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${INVALID_MAGIC_STRING}'"))
         when:
             resource.create(client)
@@ -73,7 +73,7 @@ class ScriptableResourceSpec extends Specification {
                         final JENKINSFILE    = '{{spec.pipeline}}'
                         final CREDENTIALS_ID = '{{spec.credentialsId}}'
                         final FOLDER         = '{{spec.folder}}'"""
-            def resource = new DummyCustomResource()
+            def resource = new Dummy()
             resource.metadata.name = 'Dummy'
         when:
             String result = resource.formatGroovyScript(script)
@@ -83,7 +83,7 @@ class ScriptableResourceSpec extends Specification {
     }
 
     @Log
-    class DummyCustomResource extends CustomResource implements ScriptableResource {
+    class Dummy extends CustomResource implements ScriptableResource {
         String definitionFile = '/pipeline/definition.yaml'
         String createScriptFile = '/scriptableresource/create.groovy'
         String deleteScriptFile = '/scriptableresource/delete.groovy'

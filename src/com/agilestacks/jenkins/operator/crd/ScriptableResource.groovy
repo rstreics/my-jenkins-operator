@@ -11,7 +11,9 @@ import io.fabric8.kubernetes.api.model.Doneable
 import io.fabric8.kubernetes.api.model.HasMetadata
 import io.fabric8.kubernetes.api.model.KubernetesResourceList
 import io.fabric8.kubernetes.api.model.ListMeta
+import io.fabric8.kubernetes.api.model.ListMetaBuilder
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
+import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionSpec
 import io.fabric8.kubernetes.client.KubernetesClient
 import io.fabric8.kubernetes.client.utils.Serialization
 
@@ -29,6 +31,8 @@ trait ScriptableResource implements HasMetadata {
     abstract String getCreateScriptFile()
     abstract String getDeleteScriptFile()
 
+    private Definition definition = null
+
     String getCreateScript() {
       return formatGroovyScriptFromClasspath( createScriptFile )
     }
@@ -37,10 +41,15 @@ trait ScriptableResource implements HasMetadata {
       return formatGroovyScriptFromClasspath( deleteScriptFile )
     }
 
-    Definition definition = { Definition.fromClasspath( definitionFile ) }()
+    Definition getDefinition() {
+        if (definition == null) {
+            definition = Definition.fromClasspath( definitionFile )
+        }
+        definition
+    }
 
     String getCrdID() {
-        return definition.metadata.name
+        return getDefinition().metadata.name
     }
 
     @JsonProperty("spec")
@@ -91,7 +100,7 @@ trait ScriptableResource implements HasMetadata {
     }
 
     @Log
-    static class Definition extends CustomResourceDefinition implements Props {
+    static class Definition extends CustomResourceDefinition {
 
         static Definition fromClasspath(String cpRef) {
             def payload = ScriptableResource.getResourceAsStream(cpRef)?.text
@@ -106,19 +115,19 @@ trait ScriptableResource implements HasMetadata {
             } else {
                 mapper = Serialization.jsonMapper()
             }
-            new Definition(model: mapper.readValue(payload, Map) )
+            mapper.readValue(payload, Definition)
+//            new Definition(model: mapper.readValue(payload, Map) )
+        }
+
+        String toJsonString() {
+            Serialization.jsonMapper().writeValueAsString( this )
         }
     }
 
     @Log
     static class List<T extends ScriptableResource> implements KubernetesResourceList<T>, Props {
-        ListMeta getMetadata() {
-            model.metadata
-        }
-
-        java.util.List<T> getItems() {
-            model.items
-        }
+        ListMeta metadata = new ListMetaBuilder().build()
+        java.util.List<T> items = []
     }
 
     @Log

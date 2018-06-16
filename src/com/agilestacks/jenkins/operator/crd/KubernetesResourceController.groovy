@@ -2,6 +2,7 @@ package com.agilestacks.jenkins.operator.crd
 
 import com.agilestacks.jenkins.operator.JenkinsHttpClient
 import com.agilestacks.jenkins.operator.RateLimiter
+import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
 import io.fabric8.kubernetes.client.KubernetesClientException
 import io.fabric8.kubernetes.client.Watcher
@@ -51,10 +52,18 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         }
     }
 
-    def watch(Class<T> clazz) {
+    def watch(Class<T> clazz, Object[] args=[]) {
         Constructor constructor = clazz.constructors.first()
-        def rsc = constructor.newInstance() as T
+        def rsc = constructor.newInstance(args) as T
         watch( rsc )
+    }
+
+    def getCustomresourceClient( ScriptableResource resource,
+                                 CustomResourceDefinition definition=resource.definition ) {
+        kubernetes.customResources( definition,
+                                    resource.class,
+                                    ScriptableResource.List,
+                                    ScriptableResource.Done )
     }
 
     def watch(ScriptableResource resource) {
@@ -66,9 +75,8 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         }
 
         def crd = kubernetes.customResourceDefinitions().withName(name).get()
-        kubernetes.
-            customResources(crd, resource.class, ScriptableResource.List, ScriptableResource.Done).
-            watch(this)
+        kubernetes.customResources(crd, resource.class, ScriptableResource.List, ScriptableResource.Done)
+            .watch(this)
         log.info("Watching ${name}")
     }
 

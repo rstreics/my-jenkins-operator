@@ -3,7 +3,15 @@ package com.agilestacks.jenkins.operator.util
 import io.fabric8.kubernetes.client.utils.Serialization
 
 trait Props {
-    Map model = [:]
+    private Map model = [:]
+
+    Map<String, ?> getModel() {
+        model
+    }
+
+    def setModel(Map<String, ?> newModel) {
+        model << newModel
+    }
 
     Object getProperty(String propertyName) {
         return model.get(propertyName)

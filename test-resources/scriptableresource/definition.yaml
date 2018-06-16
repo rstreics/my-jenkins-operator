@@ -1,0 +1,18 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: testdummy.jenkins.agilestacks.com
+spec:
+  group: jenkins.agilestacks.com
+  version: v1
+  scope: Namespaced
+  names:
+    plural: dummies
+    singular: dummy
+    kind: Dummy
+    categories:
+    - jenkins
+    - test
+    - dummy
+  subresources:
+    status: {}
