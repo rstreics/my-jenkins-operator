@@ -1,7 +1,10 @@
-package com.agilestacks.jenkins.operator
+package com.agilestacks.jenkins.operator.kubernetes
 
-import com.agilestacks.jenkins.operator.crd.KubernetesResourceController
-import com.agilestacks.jenkins.operator.crd.ScriptableResource
+import com.agilestacks.jenkins.operator.util.NamespacedResource
+import com.agilestacks.jenkins.operator.util.ScriptableResource
+import com.agilestacks.jenkins.operator.resources.Credentials
+import com.agilestacks.jenkins.operator.resources.EnvVars
+import com.agilestacks.jenkins.operator.resources.Pipeline
 import groovy.util.logging.Log
 import io.fabric8.kubernetes.api.model.WatchEvent
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionListBuilder
@@ -69,10 +72,10 @@ class WatcherSpec extends Specification {
 
     def getDefinitions() {
         new CustomResourceDefinitionListBuilder()
-            .withItems([ new Dummy().definition,
-                         new Pipeline().definition,
-                         new EnvVars().definition,
-                         new Credentials().definition ])
+            .withItems([new Dummy().definition,
+                        new Pipeline().definition,
+                        new EnvVars().definition,
+                        new Credentials().definition ])
             .build()
     }
 

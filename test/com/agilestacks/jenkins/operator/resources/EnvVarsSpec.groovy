@@ -1,5 +1,6 @@
-package com.agilestacks.jenkins.operator
+package com.agilestacks.jenkins.operator.resources
 
+import com.agilestacks.jenkins.operator.resources.EnvVars
 import spock.lang.Specification
 
 class EnvVarsSpec extends Specification {

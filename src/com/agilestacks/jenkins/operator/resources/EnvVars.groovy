@@ -1,7 +1,7 @@
-package com.agilestacks.jenkins.operator
+package com.agilestacks.jenkins.operator.resources
 
 import groovy.util.logging.Log
-import com.agilestacks.jenkins.operator.crd.ScriptableResource
+import com.agilestacks.jenkins.operator.util.ScriptableResource
 import io.fabric8.kubernetes.client.CustomResource
 
 @Log
@@ -10,7 +10,7 @@ class EnvVars extends CustomResource implements ScriptableResource {
     final String createScriptFile = '/envvars/create.groovy'
     final String deleteScriptFile = '/envvars/delete.groovy'
 
-    Map<String, ?> defaults = [ merge: 'ours' ]
+    final Map<String, ?> defaults = [ merge: 'ours' ]
 
     @Override
     Map<String, ?> getMergedWithDefaults() {

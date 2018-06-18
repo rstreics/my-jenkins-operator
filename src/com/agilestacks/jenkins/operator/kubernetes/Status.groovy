@@ -1,4 +1,4 @@
-package com.agilestacks.jenkins.operator.crd
+package com.agilestacks.jenkins.operator.kubernetes
 
 trait Status {
 

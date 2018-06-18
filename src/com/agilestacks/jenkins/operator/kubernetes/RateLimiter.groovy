@@ -1,4 +1,4 @@
-package com.agilestacks.jenkins.operator
+package com.agilestacks.jenkins.operator.kubernetes
 
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executors

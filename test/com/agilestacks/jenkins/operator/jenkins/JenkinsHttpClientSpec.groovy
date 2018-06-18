@@ -1,10 +1,9 @@
-package com.agilestacks.jenkins.operator
+package com.agilestacks.jenkins.operator.jenkins
 
+import com.agilestacks.jenkins.operator.jenkins.JenkinsHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import spock.lang.Specification
-
-import static com.agilestacks.jenkins.operator.JenkinsHttpClient.*
 
 class JenkinsHttpClientSpec extends Specification {
     MockWebServer server

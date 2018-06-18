@@ -1,7 +1,7 @@
-package com.agilestacks.jenkins.operator.crd
+package com.agilestacks.jenkins.operator.kubernetes
 
-import com.agilestacks.jenkins.operator.JenkinsHttpClient
-import com.agilestacks.jenkins.operator.RateLimiter
+import com.agilestacks.jenkins.operator.jenkins.JenkinsHttpClient
+import com.agilestacks.jenkins.operator.util.ScriptableResource
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
 import io.fabric8.kubernetes.client.KubernetesClientException

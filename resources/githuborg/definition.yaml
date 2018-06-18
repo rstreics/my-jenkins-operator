@@ -1,19 +1,19 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: pipelines.jenkins.agilestacks.com
+  name: githuborgs.jenkins.agilestacks.com
 spec:
   group: jenkins.agilestacks.com
   version: v1
   scope: Namespaced
   names:
-    plural: pipelines
-    singular: pipeline
-    kind: Pipeline
+    plural: githuborgs
+    singular: githuborg
+    kind: GithubServer
     categories:
     - jenkins
     - ci
-    - pipeline
+    - github
   subresources:
     status: {}
   validation:
@@ -25,21 +25,32 @@ spec:
           required:
           - repositoryUrl
           properties:
-            repositoryUrl:
+            apiUrl:
               type: string
               pattern: '(https?)(:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)'
+              nullable: true
+            username:
+              type: string
               nullable: false
-            branchSpec:
+            organization:
               type: string
-            pipeline:
-              type: string
+              nullable: false
             credentialsId:
               type: string
               nullable: true
-            folder:
+            scanCredentialsId:
               type: string
               nullable: true
-            startBuild:
-              type: boolean
-            origin:
+            description:
               type: string
+              nullable: true
+            scheduleBuild:
+              type: boolean
+              nullable: true
+
+
+#data:
+#  apiUrl: https://api.github.com
+#  organization: agilestacks
+#  credentialsId: asibot
+#  username: asibot

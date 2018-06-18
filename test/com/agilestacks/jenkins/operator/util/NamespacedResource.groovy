@@ -1,4 +1,4 @@
-package com.agilestacks.jenkins.operator
+package com.agilestacks.jenkins.operator.util
 
 trait NamespacedResource {
     def getPath(args=[:]) {

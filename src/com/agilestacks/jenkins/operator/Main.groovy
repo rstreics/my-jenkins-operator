@@ -1,6 +1,13 @@
 package com.agilestacks.jenkins.operator
 
-import com.agilestacks.jenkins.operator.crd.KubernetesResourceController
+import com.agilestacks.jenkins.operator.jenkins.JenkinsHttpClient
+import com.agilestacks.jenkins.operator.kubernetes.KubernetesResourceController
+import com.agilestacks.jenkins.operator.kubernetes.RateLimiter
+import com.agilestacks.jenkins.operator.resources.Credentials
+import com.agilestacks.jenkins.operator.resources.EnvVars
+import com.agilestacks.jenkins.operator.resources.GithubOrganization
+import com.agilestacks.jenkins.operator.resources.GithubServer
+import com.agilestacks.jenkins.operator.resources.Pipeline
 import groovy.util.logging.Log
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
 
@@ -108,6 +115,12 @@ class Main {
 
         controller.apply(Credentials)
         controller.watch(Credentials)
+
+        controller.apply(GithubServer)
+        controller.watch(GithubServer)
+
+        controller.apply(GithubOrganization)
+        controller.watch(GithubOrganization)
 
         rateLimiter.startAtFixedRate()
     }

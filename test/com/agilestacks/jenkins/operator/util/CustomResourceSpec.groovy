@@ -1,7 +1,10 @@
-package com.agilestacks.jenkins.operator
+package com.agilestacks.jenkins.operator.util
 
+import com.agilestacks.jenkins.operator.resources.Credentials
+import com.agilestacks.jenkins.operator.resources.EnvVars
+import com.agilestacks.jenkins.operator.resources.Pipeline
 import groovy.util.logging.Log
-import com.agilestacks.jenkins.operator.crd.ScriptableResource
+import com.agilestacks.jenkins.operator.util.ScriptableResource
 import io.fabric8.kubernetes.client.utils.Serialization
 import spock.lang.Specification
 

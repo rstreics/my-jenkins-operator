@@ -1,6 +1,7 @@
-package com.agilestacks.jenkins.operator
+package com.agilestacks.jenkins.operator.util
 
-import com.agilestacks.jenkins.operator.crd.ScriptableResource
+import com.agilestacks.jenkins.operator.jenkins.JenkinsHttpClient
+import com.agilestacks.jenkins.operator.util.ScriptableResource
 import com.agilestacks.jenkins.share.StringReplace
 import groovy.util.logging.Log
 import io.fabric8.kubernetes.client.CustomResource

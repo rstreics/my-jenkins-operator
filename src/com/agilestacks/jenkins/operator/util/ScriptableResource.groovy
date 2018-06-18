@@ -1,7 +1,6 @@
-package com.agilestacks.jenkins.operator.crd
+package com.agilestacks.jenkins.operator.util
 
-import com.agilestacks.jenkins.operator.JenkinsHttpClient
-import com.agilestacks.jenkins.operator.util.Props
+import com.agilestacks.jenkins.operator.jenkins.JenkinsHttpClient
 import com.agilestacks.jenkins.share.StringReplace
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonDeserializer
@@ -13,7 +12,6 @@ import io.fabric8.kubernetes.api.model.KubernetesResourceList
 import io.fabric8.kubernetes.api.model.ListMeta
 import io.fabric8.kubernetes.api.model.ListMetaBuilder
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
-import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionSpec
 import io.fabric8.kubernetes.client.KubernetesClient
 import io.fabric8.kubernetes.client.utils.Serialization
 
@@ -24,7 +22,7 @@ trait ScriptableResource implements HasMetadata {
     static final MAGIC_STRING = /(?i)\s*Status\s*:\s+CONVERGED\s*<EOF>\s*/
     static final EXCEPTION = /\.\w*Exception:/
 
-    Map<String, ?> defaults = [:]
+    final Map<String, ?> defaults = [:]
     Map<String, ?> spec = [:]
 
     abstract String getDefinitionFile()
