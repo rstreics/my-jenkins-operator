@@ -32,7 +32,7 @@ def configmap = client.
         withLabels([
                 project: 'jenkins',
                 qualifier: 'slack'
-        ]).list().items.first()?.data
+        ]).list().items?.first()?.data
 
 println configmap
 
