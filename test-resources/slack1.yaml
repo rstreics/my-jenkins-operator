@@ -1,0 +1,10 @@
+apiVersion: "jenkins.agilestacks.com/v1"
+kind: Slack
+metadata:
+  name: test-slack-configuration
+spec:
+  baseUrl: https://agilestacks-support.slack.com/services/hooks/jenkins-ci/
+  buildServerUrl: http://localhost:8080
+  room: Jenkins
+  sendAs: Jenkins
+  teamDomain: agilestacks-support

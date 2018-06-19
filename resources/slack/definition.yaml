@@ -1,0 +1,49 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: slack.jenkins.agilestacks.com
+spec:
+  group: jenkins.agilestacks.com
+  version: v1
+  scope: Namespaced
+  names:
+    plural: slacks
+    singular: slack
+    kind: Slack
+    categories:
+    - jenkins
+    - ci
+    - slack
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      type: object
+      properties:
+        spec:
+          type: object
+          required:
+          - repositoryUrl
+          properties:
+            baseUrl:
+              type: string
+              pattern: '(https?)(:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)'
+              nullable: false
+            botUser:
+              type: boolean
+              nullable: true
+            buildServerUrl:
+              type: string
+              nullable: true
+            room:
+              type: string
+              nullable: true
+            sendAs:
+              type: string
+              nullable: true
+            teamDomain:
+              type: string
+              nullable: true
+            credentialsId:
+              type: boolean
+              nullable: true

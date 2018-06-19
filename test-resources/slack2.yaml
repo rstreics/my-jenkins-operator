@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: slack-token
+  namespace: jenkins
+  labels:
+    provider: agilestacks.com
+    project: jenkins
+    qualifier: credentials
+data:
+  secret: c3VwZXJzZWNyZXQK
+---
+apiVersion: "jenkins.agilestacks.com/v1"
+kind: Credentials
+metadata:
+  name: slack-token
+spec:
+  domain: global
+  description: Secret text for slack
+  secretString:
+    secretKeyRef:
+      name: slack-token
+      key: secret
+---
+apiVersion: "jenkins.agilestacks.com/v1"
+kind: Slack
+metadata:
+  name: test-slack-configuration
+spec:
+  baseUrl: https://agilestacks-support.slack.com/services/hooks/jenkins-ci/
+  buildServerUrl: http://localhost:8080
+  room: Jenkins
+  sendAs: Jenkins
+  teamDomain: agilestacks-support
+  credentialsId: slack-token
