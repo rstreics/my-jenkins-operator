@@ -47,10 +47,3 @@ spec:
             scheduleBuild:
               type: boolean
               nullable: true
-
-
-#data:
-#  apiUrl: https://api.github.com
-#  organization: agilestacks
-#  credentialsId: asibot
-#  username: asibot
