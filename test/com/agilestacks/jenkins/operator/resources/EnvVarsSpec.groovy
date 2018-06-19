@@ -19,7 +19,7 @@ class EnvVarsSpec extends Specification implements BasicScriptableRoutines<EnvVa
     }
 
 
-    def "should defaults should be overriden"() {
+    def "defaults may be overriden"() {
         given:
         def resource1 = new EnvVars()
         def resource2 = new EnvVars()

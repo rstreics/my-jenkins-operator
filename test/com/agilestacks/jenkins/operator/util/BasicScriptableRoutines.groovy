@@ -1,6 +1,5 @@
 package com.agilestacks.jenkins.operator.util
 
-import com.agilestacks.jenkins.operator.util.ScriptableResource
 import io.fabric8.kubernetes.client.utils.Serialization
 
 trait BasicScriptableRoutines<T extends ScriptableResource> {
@@ -10,9 +9,9 @@ trait BasicScriptableRoutines<T extends ScriptableResource> {
         rsc.definition && rsc.createScript && rsc.deleteScript
     }
 
-    T fromYaml(String filepath, Class<T> clazz) {
+    static <T> T fromYaml(String filepath, Class<T> clazz) {
         final mapper = Serialization.yamlMapper()
-        def text = this.class.getResourceAsStream(filepath).text
+        def text = clazz.getResourceAsStream(filepath).text
         mapper.readValue(text, clazz)
     }
 }

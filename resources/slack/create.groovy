@@ -1,7 +1,6 @@
 package slack
 
 import jenkins.model.Jenkins
-import com.cloudbees.plugins.credentials.domains.Domain
 import net.sf.json.JSONObject
 
 def slackParameters = [
@@ -16,7 +15,6 @@ def slackParameters = [
 ]
 
 def jenk = Jenkins.get()
-def domain = Domain.global()
 def slack = jenk.getExtensionList(jenkins.plugins.slack.SlackNotifier.DescriptorImpl)[0]
 
 def formData = ['slack': ['tokenCredentialId': 'slack-token']] as JSONObject
