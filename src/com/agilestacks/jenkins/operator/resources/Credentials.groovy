@@ -36,9 +36,11 @@ class Credentials extends CustomResource implements ScriptableResource {
 
     @Override
     String getCreateScriptFile() {
-        if (spec.containsKey('secretString')) {
+        if (spec.containsKey('usernamePassword')) {
             return '/credentials/createUsernamePassword.groovy'
-        } else if (spec.containsKey('usernamePassword')) {
+        }
+
+        if (spec.containsKey('secretString')) {
             return '/credentials/createSecretString.groovy'
         }
         throw new IllegalArgumentException( "Unsupported credentials type: ${this}" )
