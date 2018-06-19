@@ -6,5 +6,5 @@ metadata:
 spec:
     merge: their
     variables:
-        TEST_VARS_IMPORTANT_URL: "https://google.com"
-        TEST_VAR: hello, world!
+        URL_VAR: "https://google.com"
+        STRING_VAR: hello, world!
