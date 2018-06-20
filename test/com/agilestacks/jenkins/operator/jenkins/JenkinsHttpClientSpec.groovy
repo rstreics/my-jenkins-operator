@@ -1,6 +1,5 @@
 package com.agilestacks.jenkins.operator.jenkins
 
-import com.agilestacks.jenkins.operator.jenkins.JenkinsHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import spock.lang.Specification
@@ -14,35 +13,35 @@ class JenkinsHttpClientSpec extends Specification {
 
     def "send ping request and receive version number"() {
         given:
-            final version = 'fakeJenkinsVersion'
-            server.enqueue(new MockResponse().addHeader('X-Jenkins', version))
+        final version = 'fakeJenkinsVersion'
+        server.enqueue(new MockResponse().addHeader('X-Jenkins', version))
         when:
-            def resp = client.ping()
+        def resp = client.ping()
         then:
-            version == resp
+        version == resp
     }
 
     def "initiate successful post request"() {
         given:
-            server.enqueue(new MockResponse().setResponseCode(200).setBody('ok'))
+        server.enqueue(new MockResponse().setResponseCode(200).setBody('ok'))
         when:
-            def resp = client.post('/script', [script: 'dummmy'])
+        def resp = client.post('/script', [script: 'dummmy'])
         then:
-            resp == 'ok'
+        resp == 'ok'
     }
 
     def "initiate post requests and handle error"() {
         given:
-            server.enqueue(new MockResponse().setResponseCode(404))
+        server.enqueue(new MockResponse().setResponseCode(404))
         when:
-            client.post('/script', [script: 'dummmy'])
+        client.post('/script', [script: 'dummmy'])
         then:
-            thrown( ConnectException )
+        thrown(ConnectException)
     }
 
 //    def "correctly handle post request with error"() {
 //        given:
-//            server.enqueue(new MockResponse().setBody(ERROR))
+//            kubernetes.enqueue(new MockResponse().setBody(ERROR))
 //
 //            def groovy = """
 //                println "Hello, World"

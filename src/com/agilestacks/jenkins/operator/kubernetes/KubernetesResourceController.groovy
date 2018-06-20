@@ -25,9 +25,9 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         return kubernetes.customResourceDefinitions() as CustomResourceDefinitionOperationsImpl
     }
 
-    def apply(Class<T> clazz) {
+    def apply(Class<T> clazz, Object... args=[]) {
         Constructor constructor = clazz.constructors.first()
-        def rsc = constructor.newInstance() as T
+        def rsc = constructor.newInstance(args) as T
         apply( rsc.definition )
     }
 
@@ -52,7 +52,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         }
     }
 
-    def watch(Class<T> clazz, Object[] args=[]) {
+    def watch(Class<T> clazz, Object... args=[]) {
         Constructor constructor = clazz.constructors.first()
         def rsc = constructor.newInstance(args) as T
         watch( rsc )
@@ -75,8 +75,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         }
 
         def crd = kubernetes.customResourceDefinitions().withName(name).get()
-        kubernetes.customResources(crd, resource.class, ScriptableResource.List, ScriptableResource.Done)
-            .watch(this)
+        kubernetes.customResources(crd, resource.class, ScriptableResource.List, ScriptableResource.Done).watch(this)
         log.info("Watching ${name}")
     }
 
