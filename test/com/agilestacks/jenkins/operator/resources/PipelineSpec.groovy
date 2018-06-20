@@ -5,7 +5,7 @@ import com.agilestacks.jenkins.operator.resources.Pipeline
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionListBuilder
 import io.fabric8.kubernetes.client.KubernetesClient
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer
-import spock.lang.*
+import spock.lang.Specification
 
 class PipelineSpec extends Specification {
 
@@ -15,48 +15,48 @@ class PipelineSpec extends Specification {
 
     def "list CRDs"() {
         given:
-        server \
+        server  \
                 .expect()
-                .get()
-                .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
-                .andReturn(200, singlePipelineCrdList() ).always()
+            .get()
+            .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
+            .andReturn(200, singlePipelineCrdList()).always()
         when:
         controller.apply(new Pipeline().definition)
 
         then:
-            def result = client.customResourceDefinitions().list()
-            1 == result.items.size()
+        def result = client.customResourceDefinitions().list()
+        1 == result.items.size()
     }
 
     def "controller creates new CRD"() {
         given:
         server.expect()
-                .get()
-                .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
-                .andReturn(200, emptyCrdList() ).once()
+            .get()
+            .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
+            .andReturn(200, emptyCrdList()).once()
         server.expect()
-                .post()
-                .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
-                .andReturn(201, null).once()
+            .post()
+            .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
+            .andReturn(201, null).once()
         server.expect()
-                .get()
-                .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
-                .andReturn(200, singlePipelineCrdList() ).once()
+            .get()
+            .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
+            .andReturn(200, singlePipelineCrdList()).once()
         when:
         controller.apply(new Pipeline().definition)
 
         then:
-            def result = client.customResourceDefinitions().list()
-            1 == result.items.size()
+        def result = client.customResourceDefinitions().list()
+        1 == result.items.size()
     }
 
     def singlePipelineCrdList() {
         new CustomResourceDefinitionListBuilder()
-                .addNewItem()
-                .withNewMetadata()
-                .withName(new Pipeline().crdID)
-                .and().and()
-                .build()
+            .addNewItem()
+            .withNewMetadata()
+            .withName(new Pipeline().crdID)
+            .and().and()
+            .build()
     }
 
     def emptyCrdList() {
@@ -67,7 +67,7 @@ class PipelineSpec extends Specification {
         server = new KubernetesServer()
         server.before()
         client = server.client
-        controller = new KubernetesResourceController( kubernetes: client )
+        controller = new KubernetesResourceController(kubernetes: client)
     }
 
     def cleanup() {

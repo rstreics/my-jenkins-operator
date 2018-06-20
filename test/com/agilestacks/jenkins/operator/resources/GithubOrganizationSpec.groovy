@@ -10,10 +10,6 @@ class GithubOrganizationSpec extends Specification implements BasicScriptableRou
         def resource = new GithubServer()
 
         expect:
-        resource.createScriptFile != null
-        resource.deleteScriptFile != null
-        resource.createScript != null
-        resource.deleteScript != null
         resource.createScript =~ MAGIC_STRING
         resource.deleteScript =~ MAGIC_STRING
 

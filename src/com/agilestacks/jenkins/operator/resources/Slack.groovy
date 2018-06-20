@@ -6,7 +6,7 @@ import io.fabric8.kubernetes.client.CustomResource
 
 @Log
 class Slack extends CustomResource implements ScriptableResource {
-    final String definitionFile   = '/slack/definition.yaml'
-    final String createScriptFile = '/slack/create.groovy'
-    final String deleteScriptFile = '/slack/delete.groovy'
+    final Definition definition = fromClassPath('/slack/definition.yaml') as Definition
+    final String createScript   = fromClassPath('/slack/create.groovy')
+    final String deleteScript   = fromClassPath('/slack/delete.groovy')
 }

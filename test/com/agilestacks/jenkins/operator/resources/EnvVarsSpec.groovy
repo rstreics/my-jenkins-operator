@@ -10,10 +10,6 @@ class EnvVarsSpec extends Specification implements BasicScriptableRoutines<EnvVa
         def resource = new EnvVars()
 
         expect:
-        resource.createScriptFile != null
-        resource.deleteScriptFile != null
-        resource.createScript != null
-        resource.deleteScript != null
         resource.createScript =~ MAGIC_STRING
         resource.deleteScript =~ MAGIC_STRING
     }
@@ -39,7 +35,7 @@ class EnvVarsSpec extends Specification implements BasicScriptableRoutines<EnvVa
         when:
         def encoded = resource.getMergedWithDefaults().variablesBase64 as String
         def props = new Properties()
-        props.load(new ByteArrayInputStream( encoded.decodeBase64() ))
+        props.load(new ByteArrayInputStream(encoded.decodeBase64()))
 
         then:
         props.URL_VAR == 'https://google.com'

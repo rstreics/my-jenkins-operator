@@ -1,7 +1,6 @@
 package com.agilestacks.jenkins.operator.util
 
 import com.agilestacks.jenkins.operator.jenkins.JenkinsHttpClient
-import com.agilestacks.jenkins.operator.util.ScriptableResource
 import com.agilestacks.jenkins.share.StringReplace
 import groovy.util.logging.Log
 import io.fabric8.kubernetes.client.CustomResource
@@ -17,77 +16,77 @@ class ScriptableResourceSpec extends Specification {
 
     def "can render script from classpath"() {
         given:
-            def resource1 = new Dummy()
-            def resource2 = new Dummy()
+        def resource1 = new Dummy()
+        def resource2 = new Dummy()
         when:
-            resource1.metadata.name = 'Dummy'
-            resource2.metadata.name = 'Stubby'
+        resource1.metadata.name = 'Dummy'
+        resource2.metadata.name = 'Stubby'
         then:
-            resource1.createScript =~ 'Dummy'
-            resource1.deleteScript =~ 'Dummy'
-            resource2.createScript =~ 'Stubby'
-            resource2.deleteScript =~ 'Stubby'
+        resource1.createScript != null
+        resource1.deleteScript != null
+        resource2.createScript != null
+        resource2.deleteScript != null
     }
 
     def "can submit create and delete scripts to Jenkins"() {
         given:
-            def resource = new Dummy()
-            server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${MAGIC_STRING}'"))
-            server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${MAGIC_STRING}'"))
+        def resource = new Dummy()
+        server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${MAGIC_STRING}'"))
+        server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${MAGIC_STRING}'"))
         when:
-            def result1 = resource.create(client)
-            def result2 = resource.delete(client)
+        def result1 = resource.create(client)
+        def result2 = resource.delete(client)
         then:
-            resource.createScript != null
-            resource.deleteScript != null
-            result1 =~ MAGIC_STRING
-            result2 =~ MAGIC_STRING
+        resource.createScript != null
+        resource.deleteScript != null
+        result1 =~ MAGIC_STRING
+        result2 =~ MAGIC_STRING
     }
 
     def "send script should work if script contains a magic string"() {
         given:
-            def resource = new Dummy()
-            server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${MAGIC_STRING}'"))
+        def resource = new Dummy()
+        server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${MAGIC_STRING}'"))
         when:
-            def result = resource.sendScript(resource.createScript, client)
+        def result = resource.sendScript(resource.createScript, client)
         then:
-            result =~ MAGIC_STRING
+        result =~ MAGIC_STRING
     }
 
     def "send script should throw exception if invalid magic string"() {
         given:
-            def resource = new Dummy()
-            server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${INVALID_MAGIC_STRING}'"))
+        def resource = new Dummy()
+        server.enqueue(new MockResponse().setResponseCode(200).setBody("println '${INVALID_MAGIC_STRING}'"))
         when:
-            resource.create(client)
-            resource.delete(client)
+        resource.create(client)
+        resource.delete(client)
         then:
-            thrown(RuntimeException)
+        thrown(RuntimeException)
     }
 
     def "format script should replace unrendered mustaches with empty string"() {
         given:
-            def script = """\
+        def script = """\
                         final NAME           = '{{metadata.name}}'
                         final URL            = '{{spec.repositoryUrl}}'
                         final BRANCH_SPEC    = '{{spec.branchSpec}}'
                         final JENKINSFILE    = '{{spec.pipeline}}'
                         final CREDENTIALS_ID = '{{spec.credentialsId}}'
                         final FOLDER         = '{{spec.folder}}'"""
-            def resource = new Dummy()
-            resource.metadata.name = 'Dummy'
+        def resource = new Dummy()
+        resource.metadata.name = 'Dummy'
         when:
-            String result = resource.formatGroovyScript(script)
+        String result = resource.renderTemplate(script)
         then:
-            result =~ /''/
-            !(result =~ StringReplace.MUSTACHE)
+        result =~ /''/
+        !(result =~ StringReplace.MUSTACHE)
     }
 
     @Log
     class Dummy extends CustomResource implements ScriptableResource {
-        String definitionFile = '/pipeline/definition.yaml'
-        String createScriptFile = '/scriptableresource/create.groovy'
-        String deleteScriptFile = '/scriptableresource/delete.groovy'
+        final Definition definition = fromClassPath('/scriptableresource/definition.yaml') as Definition
+        final String createScript = fromClassPath('/scriptableresource/create.groovy') as String
+        final String deleteScript = fromClassPath('/scriptableresource/delete.groovy') as String
     }
 
     def setup() {

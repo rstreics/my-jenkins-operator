@@ -8,8 +8,8 @@ import io.fabric8.kubernetes.client.KubernetesClient
 
 @Log
 class Credentials extends CustomResource implements ScriptableResource {
-    final String definitionFile   = '/credentials/definition.yaml'
-    final String deleteScriptFile = '/credentials/delete.groovy'
+    final Definition definition = fromClassPath('/credentials/definition.yaml') as Definition
+    final String deleteScript = fromClassPath('/credentials/delete.groovy')
 
     @Override
     def create(JenkinsHttpClient jenkins, KubernetesClient kubernetes) {
@@ -30,19 +30,22 @@ class Credentials extends CustomResource implements ScriptableResource {
             data.
             get(secretRef.key as String)
 
-        def groovy = formatGroovyScriptFromClasspath( createScriptFile,  params)
+        def groovy = renderTemplate(this.createScript,  params)
         sendScript(groovy, jenkins)
     }
 
-    @Override
-    String getCreateScriptFile() {
+    String getCreateScriptFilename() {
         if (spec.containsKey('usernamePassword')) {
             return '/credentials/createUsernamePassword.groovy'
         }
-
         if (spec.containsKey('secretString')) {
             return '/credentials/createSecretString.groovy'
         }
         throw new IllegalArgumentException( "Unsupported credentials type: ${this}" )
+    }
+
+    @Override
+    String getCreateScript() {
+        fromClassPath( this.createScriptFilename )
     }
 }

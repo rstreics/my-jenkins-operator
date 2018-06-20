@@ -25,26 +25,9 @@ trait ScriptableResource implements HasMetadata {
     final Map<String, ?> defaults = [:]
     Map<String, ?> spec = [:]
 
-    abstract String getDefinitionFile()
-    abstract String getCreateScriptFile()
-    abstract String getDeleteScriptFile()
-
-    private Definition definition = null
-
-    String getCreateScript() {
-      return formatGroovyScriptFromClasspath( createScriptFile )
-    }
-
-    String getDeleteScript() {
-      return formatGroovyScriptFromClasspath( deleteScriptFile )
-    }
-
-    Definition getDefinition() {
-        if (definition == null) {
-            definition = Definition.fromClasspath( definitionFile )
-        }
-        definition
-    }
+    abstract Definition getDefinition()
+    abstract String getCreateScript();
+    abstract String getDeleteScript();
 
     String getCrdID() {
         return getDefinition().metadata.name
@@ -56,12 +39,12 @@ trait ScriptableResource implements HasMetadata {
     }
 
     def create(JenkinsHttpClient jenkins, KubernetesClient kubernetes=null) {
-        def text = getCreateScript()
+        def text = renderTemplate(createScript, mergedWithDefaults)
         sendScript(text, jenkins)
     }
 
     def delete(JenkinsHttpClient jenkins, KubernetesClient kubernetes=null) {
-        def text = getDeleteScript()
+        def text = renderTemplate(createScript, mergedWithDefaults)
         sendScript(text, jenkins)
     }
 
@@ -85,38 +68,37 @@ trait ScriptableResource implements HasMetadata {
          metadata: metadata.properties]
     }
 
-    String formatGroovyScriptFromClasspath(String filename, Map params=getMergedWithDefaults()) {
-        String text = ScriptableResource.getResourceAsStream(filename).text
-        formatGroovyScript(text)
+    static def fromClassPath(String filename) {
+        def value = ScriptableResource.getResourceAsStream(filename)?.text
+        new ClassPathWrapper(value: value)
     }
 
-    String formatGroovyScript(String text, Map params=getMergedWithDefaults()) {
+    static String renderTemplate(String text, Map<String, ?>  params=[:]) {
         def templater = new StringReplace()
         log.info("Apply script parameters: ${params}")
         def rendered = templater.mustache(text, params)
         templater.eraseMustache(rendered)
     }
 
-    @Log
-    static class Definition extends CustomResourceDefinition {
+    static class ClassPathWrapper {
+        String value
 
-        static Definition fromClasspath(String cpRef) {
-            def payload = ScriptableResource.getResourceAsStream(cpRef)?.text
-            if (!payload) {
-                throw new RuntimeException("Cannot find ${cpRef} in classpath")
+        Object asType(Class clazz) {
+            if (clazz == Definition) {
+                def mapper =Serialization.yamlMapper()
+                return mapper.readValue(value, Definition)
             }
 
-            def ext = cpRef.split('\\.').last()
-            final mapper
-            if (ext == 'yml' || ext == 'yaml' ) {
-                mapper = Serialization.yamlMapper()
-            } else {
-                mapper = Serialization.jsonMapper()
-            }
-            mapper.readValue(payload, Definition)
-//            new Definition(model: mapper.readValue(payload, Map) )
+            return value.asType(clazz)
         }
 
+        String toString() {
+            return value
+        }
+    }
+
+    @Log
+    static class Definition extends CustomResourceDefinition {
         String toJsonString() {
             Serialization.jsonMapper().writeValueAsString( this )
         }

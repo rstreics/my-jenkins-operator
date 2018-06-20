@@ -11,8 +11,7 @@ class CredentialsSpec extends Specification implements BasicScriptableRoutines<C
 
         expect:
         resource.spec.containsKey('usernamePassword')
-        resource.createScriptFile == '/credentials/createUsernamePassword.groovy'
-        resource.deleteScriptFile != null
+        resource.createScriptFilename == '/credentials/createUsernamePassword.groovy'
         resource.createScript =~ MAGIC_STRING
         resource.deleteScript =~ MAGIC_STRING
     }
@@ -24,8 +23,7 @@ class CredentialsSpec extends Specification implements BasicScriptableRoutines<C
 
         expect:
         resource.spec.containsKey('secretString')
-        resource.createScriptFile == '/credentials/createSecretString.groovy'
-        resource.deleteScriptFile != null
+        resource.createScriptFilename == '/credentials/createSecretString.groovy'
         resource.createScript =~ MAGIC_STRING
         resource.deleteScript =~ MAGIC_STRING
     }

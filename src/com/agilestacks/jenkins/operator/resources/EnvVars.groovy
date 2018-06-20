@@ -6,9 +6,9 @@ import io.fabric8.kubernetes.client.CustomResource
 
 @Log
 class EnvVars extends CustomResource implements ScriptableResource {
-    final String definitionFile   = '/envvars/definition.yaml'
-    final String createScriptFile = '/envvars/create.groovy'
-    final String deleteScriptFile = '/envvars/delete.groovy'
+    final Definition definition = fromClassPath('/envvars/definition.yaml') as Definition
+    final String createScript   = fromClassPath('/envvars/create.groovy')
+    final String deleteScript   = fromClassPath('/envvars/delete.groovy')
 
     final Map<String, ?> defaults = [ merge: 'ours' ]
 
