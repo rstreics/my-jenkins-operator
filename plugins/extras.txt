@@ -2,3 +2,4 @@ slack:2.3
 credentials-binding:1.16
 embeddable-build-status:1.9
 aws-credentials:1.23
+pipeline-aws:1.27
