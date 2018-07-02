@@ -3,8 +3,8 @@ package com.agilestacks.jenkins.share
 import java.nio.file.Files
 import java.nio.file.Path
 
-class Temp {
-    static Path createTempFile(Path path, String ext='tmp', boolean deleteOnExit=true) {
+class TempFile {
+    static Path create(Path path, String ext='tmp', boolean deleteOnExit=true) {
         def directory = path
         def filename = ""
         if ( !path.toFile().isDirectory() ) {
