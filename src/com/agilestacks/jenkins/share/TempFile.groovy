@@ -3,6 +3,7 @@ package com.agilestacks.jenkins.share
 import java.nio.file.Files
 import java.nio.file.Paths
 
+@Deprecated
 class TempFile {
     static String create(String basedir='.', String ext='tmp', boolean deleteOnExit=true) {
         def path = Paths.get(basedir)

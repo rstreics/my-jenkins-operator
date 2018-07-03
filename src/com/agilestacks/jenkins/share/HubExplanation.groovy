@@ -2,6 +2,8 @@ package com.agilestacks.jenkins.share
 
 import groovy.json.JsonSlurper
 
+
+@Deprecated
 class HubExplanation {
 
     Map<String, ?> explain
