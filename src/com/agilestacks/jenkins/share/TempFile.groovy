@@ -4,7 +4,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class TempFile {
-    static String create(String basedir="/tmp", String ext='tmp', boolean deleteOnExit=true) {
+    static String create(String basedir='.', String ext='tmp', boolean deleteOnExit=true) {
         def path = Paths.get(basedir)
         def directory = path
         def filename = ""
