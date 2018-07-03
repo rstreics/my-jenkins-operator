@@ -120,7 +120,7 @@ class Main {
         controller.watch(GithubServer)
 
         controller.apply(GithubOrganization)
-        controller.watch(GithubOrganization)
+//        controller.watch(GithubOrganization)
 
         rateLimiter.startAtFixedRate()
     }

@@ -2,6 +2,7 @@ package pipelines
 
 import jenkins.model.*
 import hudson.model.*
+import groovy.json.JsonSlurper
 import java.util.logging.Logger
 import hudson.plugins.git.*
 import org.jenkinsci.plugins.workflow.cps.*
@@ -16,6 +17,7 @@ final CREDENTIALS_ID = '{{spec.credentialsId}}' ?: null
 final FOLDER         = '{{spec.folder}}' ?: null
 final START_BUILD    = '{{spec.startBuild}}'.toBoolean()
 final ORIGIN         = '{{spec.origin}}' ?: null
+final PARAMS_BASE64  = '''{{paramsBase64}}'''.trim()
 
 def folderName(def folder) {
     if (folder.getParent() instanceof Jenkins) {
@@ -49,19 +51,30 @@ if (!found) {
         parent = createFolder(FOLDER)
     }
 
-    def pipeline = [FOLDER, NAME].findAll {it}.join('/')
+    final pipeline = [FOLDER, NAME].findAll {it}.join('/')
     println "Creating pipeline: ${pipeline}"
-    def repos = GitSCM.createRepoList(URL, CREDENTIALS_ID)
-    def branchSpec = new BranchSpec( BRANCH_SPEC )
-    def scm = new GitSCM(repos, [branchSpec], false, [], null, null, [])
-    def job = new WorkflowJob(parent, NAME )
+    final repos = GitSCM.createRepoList(URL, CREDENTIALS_ID)
+    final branchSpec = new BranchSpec( BRANCH_SPEC )
+    final scm = new GitSCM(repos, [branchSpec], false, [], null, null, [])
+    final job = new WorkflowJob(parent, NAME)
+    if (PARAMS_BASE64) {
+        final params = new JsonSlurper().parse(PARAMS_BASE64.decodeBase64())
+        println "params: ${params}"
+        def paramDefs = params.collect {
+            final type = it.type ?: 'string'
+            println "Add job parameter ${type}:${it.name}"
+            new StringParameterDefinition(it.name, it.defaultValue, it.description)
+        }
+        job.addProperty( new ParametersDefinitionProperty( paramDefs ) )
+
+    }
     job.definition = new CpsScmFlowDefinition(scm, JENKINSFILE )
     Jenkins.get().reload()
     if (START_BUILD) {
         if (!job.inQueue) {
             int delay = 0
-            def cause = new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}")
-            def action = new CauseAction(cause)
+            final cause = new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}")
+            final action = new CauseAction(cause)
             job.scheduleBuild2(delay, action)
             println "${pipeline}: automated build process"
         }

@@ -1,6 +1,7 @@
 package com.agilestacks.jenkins.operator.resources
 
 import com.agilestacks.jenkins.operator.util.ScriptableResource
+import groovy.json.JsonOutput
 import groovy.util.logging.Log
 import io.fabric8.kubernetes.client.CustomResource
 
@@ -17,4 +18,13 @@ class Pipeline extends CustomResource implements ScriptableResource {
         startBuild: true
     ]
 
+    @Override
+    Map<String, ?> getMergedWithDefaults() {
+        final p = JsonOutput.toJson( spec.parameters ?: [] )
+        [kind: kind,
+         apiVersion: apiVersion,
+         spec: defaults + spec,
+         metadata: metadata.properties,
+         paramsBase64: p.bytes.encodeBase64(true)]
+    }
 }

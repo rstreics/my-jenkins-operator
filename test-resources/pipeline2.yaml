@@ -2,7 +2,7 @@
 apiVersion: "jenkins.agilestacks.com/v1"
 kind: Pipeline
 metadata:
-  name: nodejs-app
+  name: myreactjs
 spec:
   repositoryUrl: "https://github.com/agilestacks/applications.git"
   folder: sample-pipelines
