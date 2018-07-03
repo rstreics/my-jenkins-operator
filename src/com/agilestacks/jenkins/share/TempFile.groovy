@@ -1,13 +1,14 @@
 package com.agilestacks.jenkins.share
 
 import java.nio.file.Files
-import java.nio.file.Path
+import java.nio.file.Paths
 
 class TempFile {
-    static Path create(Path path, String ext='tmp', boolean deleteOnExit=true) {
+    static String create(String basedir="/tmp", String ext='tmp', boolean deleteOnExit=true) {
+        def path = Paths.get(basedir)
         def directory = path
         def filename = ""
-        if ( !path.toFile().isDirectory() ) {
+        if ( !path.toFile().directory ) {
             directory =  path.parent
             filename = path.fileName.toString()
         }
@@ -21,6 +22,6 @@ class TempFile {
             temp.toFile().deleteOnExit()
         }
 
-        return temp
+        return temp.toString()
     }
 }
