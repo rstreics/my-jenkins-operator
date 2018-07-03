@@ -18,5 +18,5 @@ spec:
     description: Context path of the applicaiton (empty means root)
   - name: STATE_FILE
     type: string
-    defaultValue: hello-kitty
+    defaultValue: s3://terraform.agilestacks.com/antondo2.kubernetes.delivery/hub/prod/hub.state
     description: Full path to the backend stack state file
