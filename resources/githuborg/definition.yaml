@@ -9,7 +9,7 @@ spec:
   names:
     plural: githuborgs
     singular: githuborg
-    kind: GithubServer
+    kind: GithubOrganization
     categories:
     - jenkins
     - ci

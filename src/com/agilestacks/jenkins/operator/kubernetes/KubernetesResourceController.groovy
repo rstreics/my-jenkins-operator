@@ -35,7 +35,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         def name = definition.metadata.name
 
         def existing = crd.list().items.find{ name == it.metadata.name }
-        if (existing) {
+        if (existing.find{it.metadata.name == name}) {
             log.info("Found: ${name}")
             return
         }
@@ -70,8 +70,8 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         String name = resource.definition.metadata.name
 
         def existing = crd.list().items
-        if (!existing) {
-            throw new RuntimeException("Cannot push CRD ${name}")
+        if ( !existing.find{it.metadata.name == name} ) {
+            throw new RuntimeException("Cannot find CRD: ${name}")
         }
 
         def crd = kubernetes.customResourceDefinitions().withName(name).get()
