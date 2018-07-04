@@ -1,76 +1,46 @@
 package com.agilestacks.jenkins.operator.resources
 
-import com.agilestacks.jenkins.operator.kubernetes.KubernetesResourceController
-import com.agilestacks.jenkins.operator.resources.Pipeline
-import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionListBuilder
-import io.fabric8.kubernetes.client.KubernetesClient
-import io.fabric8.kubernetes.client.server.mock.KubernetesServer
+import com.agilestacks.jenkins.operator.util.BasicScriptableRoutines
+import groovy.json.JsonSlurper
 import spock.lang.Specification
 
-class PipelineSpec extends Specification {
+class PipelineSpec extends Specification implements BasicScriptableRoutines<Credentials> {
 
-    KubernetesServer server
-    KubernetesClient client
-    KubernetesResourceController controller
-
-    def "list CRDs"() {
+    def "all scripts accessible and contains a magic string"() {
         given:
-        server  \
-                .expect()
-            .get()
-            .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
-            .andReturn(200, singlePipelineCrdList()).always()
+        final resource = new Pipeline()
+
+        expect:
+        resource.createScript =~ MAGIC_STRING
+        resource.deleteScript =~ MAGIC_STRING
+    }
+
+
+    def "can add new parameters"() {
+        given:
+        final resource1 = new Pipeline()
+
         when:
-        controller.apply(new Pipeline().definition)
+        resource1.addParameter('TEST', 'passed')
 
         then:
-        def result = client.customResourceDefinitions().list()
-        1 == result.items.size()
+        resource1.spec.parameters.size == 1
+        resource1.spec.parameters[0].name == 'TEST'
+        resource1.spec.parameters[0].defaultValue == 'passed'
     }
 
-    def "controller creates new CRD"() {
+
+    def "parameters has been encoded base64"() {
         given:
-        server.expect()
-            .get()
-            .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
-            .andReturn(200, emptyCrdList()).once()
-        server.expect()
-            .post()
-            .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
-            .andReturn(201, null).once()
-        server.expect()
-            .get()
-            .withPath('/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions')
-            .andReturn(200, singlePipelineCrdList()).once()
+        final resource1 = new Pipeline()
+
         when:
-        controller.apply(new Pipeline().definition)
+        resource1.addParameter('TEST', 'passed')
+        final base64Encoded = resource1.mergedWithDefaults.paramsBase64 as String
+        final params1 = resource1.spec.parameters
+        final params2 = new JsonSlurper().parse( base64Encoded.decodeBase64() )
 
         then:
-        def result = client.customResourceDefinitions().list()
-        1 == result.items.size()
-    }
-
-    def singlePipelineCrdList() {
-        new CustomResourceDefinitionListBuilder()
-            .addNewItem()
-            .withNewMetadata()
-            .withName(new Pipeline().crdID)
-            .and().and()
-            .build()
-    }
-
-    def emptyCrdList() {
-        new CustomResourceDefinitionListBuilder().build()
-    }
-
-    def setup() {
-        server = new KubernetesServer()
-        server.before()
-        client = server.client
-        controller = new KubernetesResourceController(kubernetes: client)
-    }
-
-    def cleanup() {
-        server.after()
+        params1 == params2
     }
 }

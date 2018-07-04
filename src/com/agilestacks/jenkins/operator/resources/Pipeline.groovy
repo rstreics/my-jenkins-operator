@@ -27,4 +27,13 @@ class Pipeline extends CustomResource implements ScriptableResource {
          metadata: metadata.properties,
          paramsBase64: p.bytes.encodeBase64(true)]
     }
+
+    def addParameter(name, defaultValue, type='string', description='') {
+        spec.parameters = spec.parameters ?: []
+        spec.parameters << [ name: name,
+                             defaultValue: defaultValue,
+                             type: type,
+                             description: description ]
+    }
+
 }
