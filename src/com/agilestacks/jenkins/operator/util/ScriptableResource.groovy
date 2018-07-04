@@ -44,7 +44,7 @@ trait ScriptableResource implements HasMetadata {
     }
 
     def delete(JenkinsHttpClient jenkins, KubernetesClient kubernetes=null) {
-        def text = renderTemplate(createScript, mergedWithDefaults)
+        def text = renderTemplate(deleteScript, mergedWithDefaults)
         sendScript(text, jenkins)
     }
 

@@ -17,7 +17,7 @@ if (!kube.serverUrl) {
     kube.serverUrl = "${k8sPort == '443' ? 'https' : 'http'}://${k8sHost}:${k8sPort}/"
 }
 
-kube.jenkinsUrl = '{{spec.jenkinsUrl}}' ?: null
+kube.jenkinsUrl = '{{spec.jenkinsUrl}}' ?: System.getenv('JENKINS_URL')
 if (!kube.jenkinsUrl) {
     def jenkHost  = System.getenv('JENKINS_SERVICE_HOST')
     def jenkPort  = System.getenv('JENKINS_SERVICE_PORT') ?: '8080'
