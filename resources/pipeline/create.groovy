@@ -59,11 +59,16 @@ if (!found) {
     final job = new WorkflowJob(parent, NAME)
     if (PARAMS_BASE64) {
         final params = new JsonSlurper().parse(PARAMS_BASE64.decodeBase64())
-        println "params: ${params}"
-        def paramDefs = params.collect {
-            final type = it.type ?: 'string'
-            println "Add job parameter ${type}:${it.name}"
-            new StringParameterDefinition(it.name, it.defaultValue, it.description)
+        final paramDefs = params.collect {
+            def type = it.type.trim() ?: 'string'
+            println "Add parameter ${type}:${it.name}"
+            if (type == 'string') {
+                return new StringParameterDefinition(it.name, it.defaultValue, it.description)
+            }
+            if (type == 'boolean') {
+                return new BooleanParameterDefinition(it.name, it.defaultValue ?: false, it.description)
+            }
+            throw new RuntimeException("Unsupported parameter type: ${type}")
         }
         job.addProperty( new ParametersDefinitionProperty( paramDefs ) )
 
