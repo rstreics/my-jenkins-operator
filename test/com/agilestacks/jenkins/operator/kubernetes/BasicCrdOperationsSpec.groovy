@@ -1,6 +1,5 @@
 package com.agilestacks.jenkins.operator.kubernetes
 
-import com.agilestacks.jenkins.operator.kubernetes.KubernetesResourceController
 import com.agilestacks.jenkins.operator.resources.Pipeline
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionListBuilder
 import io.fabric8.kubernetes.client.KubernetesClient
