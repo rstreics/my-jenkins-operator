@@ -6,7 +6,7 @@ import io.fabric8.kubernetes.client.CustomResource
 
 @Log
 class Kubernetes extends CustomResource implements ScriptableResource {
-    final Definition definition = fromClassPath('/kubernetees/definition.yaml') as Definition
+    final Definition definition = fromClassPath('/kubernentes/definition.yaml') as Definition
     final String createScript   = fromClassPath('/kubernentes/create.groovy')
     final String deleteScript   = fromClassPath('/kubernentes/delete.groovy')
 

@@ -10,13 +10,12 @@ import io.fabric8.kubernetes.client.dsl.base.OperationSupport
 import io.fabric8.kubernetes.client.dsl.internal.CustomResourceDefinitionOperationsImpl
 import okhttp3.Request
 import okhttp3.RequestBody
+import groovy.util.logging.Slf4j
 
 import java.lang.reflect.Constructor
-import java.util.logging.Logger
 
+@Slf4j
 class KubernetesResourceController<T extends ScriptableResource> implements Watcher<T> {
-    final log = Logger.getLogger(this.class.name)
-
     DefaultKubernetesClient kubernetes
     RateLimiter queue
     JenkinsHttpClient jenkins
@@ -36,17 +35,17 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
 
         def existing = crd.list().items.find{ name == it.metadata.name }
         if (existing.find{it.metadata.name == name}) {
-            log.info("Found: ${name}")
+            log.info "Found: ${name}"
             return
         }
-        log.info("Creating: ${name}")
+        log.info "Creating: ${name}"
         def request = new Request.Builder()
                 .post(RequestBody.create( OperationSupport.JSON, definition.toJsonString() ))
                 .url(crd.resourceUrl)
                 .build()
         def resp = kubernetes.httpClient.newCall(request).execute()
 
-        log.finest("Response: [${resp.toString()}]")
+        log.debug "Response: [${resp.toString()}]"
         if (resp.code() >= 400) {
             throw new RuntimeException("Unable to create CRD [resp: ${resp.code()}, text: ${resp.body().string()}]")
         }
@@ -55,7 +54,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
     def watch(Class<T> clazz, Object... args=[]) {
         Constructor constructor = clazz.constructors.first()
         def rsc = constructor.newInstance(args) as T
-        watch( rsc )
+        watch(rsc)
     }
 
     def getCustomresourceClient( ScriptableResource resource,
@@ -74,9 +73,13 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
             throw new RuntimeException("Cannot find CRD: ${name}")
         }
 
-        def crd = kubernetes.customResourceDefinitions().withName(name).get()
-        kubernetes.customResources(crd, resource.class, ScriptableResource.List, ScriptableResource.Done).watch(this)
-        log.info("Watching ${name}")
+        try {
+            def crd = kubernetes.customResourceDefinitions().withName(name).get()
+            kubernetes.customResources(crd, resource.class, ScriptableResource.List, ScriptableResource.Done).watch(this)
+            log.info("Watching ${name}")
+        } catch (KubernetesClientException err) {
+            log.error "Unable watch CRD: ${name}. Moving o", err
+        }
     }
 
     @Override
@@ -103,7 +106,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
                 log.info "done"
             }
         } else {
-            log.severe("Unsupported action ${action} for ${resource.metadata.name}")
+            log.debug "Unsupported action ${action} for ${resource.metadata.name}"
             throw new UnsupportedOperationException("Operation ${action} not yet supported")
         }
     }
