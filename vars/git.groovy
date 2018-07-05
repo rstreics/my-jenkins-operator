@@ -2,6 +2,9 @@
  * Git build routines
  */
 
+import hudson.util.*
+import hudson.model.*
+
 /**
  * @return name of the current branch. Also stores in BRANCH_NAME env variable
  */
