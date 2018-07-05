@@ -5,13 +5,16 @@
 import hudson.util.*
 import hudson.model.*
 
+import java.util.logging.Level
+import java.util.logging.Logger
+
 /**
  * @return name of the current branch. Also stores in BRANCH_NAME env variable
  */
 def branch() {
-    Run build = $build()
-    final log = Logger.getLogger('git')
-    final env = build.getEnvironment(new LogTaskListener(log, Level.INFO))
+    final env = $build().getEnvironment(
+        new LogTaskListener(Logger.getLogger('git'), Level.INFO)
+    )
 
     if (env.BRANCH_NAME) {
         return env.BRANCH_NAME
@@ -27,10 +30,10 @@ def branch() {
 /**
  * @return name of the remote (origin by default). Also stores in GIT_REMOTE_{{NAME}} env variable
  */
-def remoteUrl(String remote='origin') {
-    Run build = $build()
-    final log = Logger.getLogger('git')
-    final env = build.getEnvironment(new LogTaskListener(log, Level.INFO))
+def remote(String remote='origin') {
+    final env = $build().getEnvironment(
+        new LogTaskListener(Logger.getLogger('git'), Level.INFO)
+    )
     if (env."GIT_REMOTE_${remote.toUpperCase()}") {
         return env."GIT_REMOTE_${remote.toUpperCase()}"
     }
