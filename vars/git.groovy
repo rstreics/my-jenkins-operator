@@ -2,45 +2,43 @@
  * Git build routines
  */
 
-import hudson.util.*
-import hudson.model.*
-
-import java.util.logging.Level
-import java.util.logging.Logger
-
 /**
- * @return name of the current branch. Also stores in BRANCH_NAME env variable
+ * @return name of the remote (origin by default).
  */
-def branch() {
-    final env = $build().getEnvironment(
-        new LogTaskListener(Logger.getLogger('git'), Level.INFO)
-    )
-
-    if (env.BRANCH_NAME) {
-        return env.BRANCH_NAME
+def remote() {
+    if (scm.userRemoteConfigs) {
+        return scm.userRemoteConfigs[0].url
     }
+    return sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
+}
 
-    final branch = sh(returnStdout: true,
-                      script: 'git rev-parse --abbrev-ref HEAD').trim()
-
-    env.BRANCH_NAME = branch
+def branch() {
+    def branch
+    if (scm.branches) {
+        def t = scm.branches[0].name as String
+        branch = t.split('/').last()
+    } else {
+        branch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+        if (branch == 'HEAD') {
+            branch = 'master'
+        }
+    }
     return branch
 }
 
-/**
- * @return name of the remote (origin by default). Also stores in GIT_REMOTE_{{NAME}} env variable
- */
-def remote(String remote='origin') {
-    final env = $build().getEnvironment(
-        new LogTaskListener(Logger.getLogger('git'), Level.INFO)
-    )
-    if (env."GIT_REMOTE_${remote.toUpperCase()}") {
-        return env."GIT_REMOTE_${remote.toUpperCase()}"
+
+def getRemote() {
+    remote()
+}
+
+def getBranch() {
+    branch()
+}
+
+def commitHash(args=[:]) {
+    final arv = [short: true] << args
+    if (argv.short) {
+        return sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
     }
-
-
-    final origin = sh(returnStdout: true,
-                      script: "git config --get remote.${remote}.url").trim()
-    env."GIT_REMOTE_${remote.toUpperCase()}" = origin
-    return origin
+    return sh(script: 'git rev-parse --long HEAD', returnStdout: true).trim()
 }
