@@ -3,10 +3,6 @@
  * This global variable provides easy access to current build routines.
  * @link isSuccess()
  */
-//@GrabResolver(name='releases', root='http://repo.jenkins-ci.org/releases/')
-//@Grab(group='org.jenkins-ci.plugins.workflow', module='workflow-support', version='2.13')
-//@Grab(group='org.jenkins-ci.plugins.workflow', module='workflow-support', version='2.14')
-//@Grab(group='org.jenkins-ci.plugins', module='junit', version='1.21')
 import hudson.tasks.test.AbstractTestResultAction
 import hudson.model.Result
 import hudson.model.Run

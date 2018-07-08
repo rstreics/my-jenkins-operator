@@ -1,10 +1,6 @@
 #!/usr/bin/env groovy
 
-@GrabResolver(name='public',   root='http://repo.jenkins-ci.org/public/')
-@GrabResolver(name='releases', root='http://repo.jenkins-ci.org/releases/')
-@Grab(group='org.jenkins-ci.plugins.workflow', module='workflow-support', version='2.18')
 import org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper
-
 
 private def getRepoURL() {
     sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()

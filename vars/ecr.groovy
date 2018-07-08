@@ -1,8 +1,5 @@
 #!/usr/bin/env groovy
 
-@GrabResolver(name='central', root='http://central.maven.org/maven2/')
-@Grab(group = 'com.amazonaws', module = 'aws-java-sdk', version = '1.11.313')
-@Grab(group='software.amazon.ion', module='ion-java', version='1.0.2')
 import com.amazonaws.services.ecr.model.*
 import com.amazonaws.services.ecr.*
 import com.amazonaws.regions.Regions

@@ -1,10 +1,7 @@
 #!/usr/bin/env groovy
 
-// @GrabResolver(name='releases', root='http://repo.jenkins-ci.org/releases/')
-// @Grab(group='org.jenkins-ci.plugins.workflow', module='workflow-support', version='2.13')
 import hudson.model.Result
 import hudson.model.Run
-//import org.jenkinsci.plugins.workflow.job.WorkflowRun
 
 def success(Closure body=null) {
     Run build = $build()
