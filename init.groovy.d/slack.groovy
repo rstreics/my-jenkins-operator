@@ -32,9 +32,7 @@ def configmap = client.
         withLabels([
                 project: 'jenkins',
                 qualifier: 'slack'
-        ]).list().items?.first()?.data
-
-println configmap
+        ]).list().items[0]?.data
 
 if (!configmap) {
     println 'Cannot find slack configmap'
