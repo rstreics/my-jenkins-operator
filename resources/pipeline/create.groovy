@@ -77,10 +77,10 @@ if (!found) {
     Jenkins.get().reload()
     if (START_BUILD) {
         if (!job.inQueue) {
-            final delay = 5000
+            final afterSecs = 5
             final cause = new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}")
             final action = new CauseAction(cause)
-            job.scheduleBuild2(delay, action)
+            job.scheduleBuild2(afterSecs, action)
             println "${pipeline}: automated build process"
         }
     } else {
