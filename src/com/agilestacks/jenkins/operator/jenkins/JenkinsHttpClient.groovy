@@ -1,6 +1,6 @@
 package com.agilestacks.jenkins.operator.jenkins
 
-import groovy.util.logging.Log
+import groovy.util.logging.Slf4j
 import okhttp3.Authenticator
 import okhttp3.Credentials
 import okhttp3.FormBody
@@ -10,7 +10,7 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 
-@Log
+@Slf4j
 class JenkinsHttpClient  {
 
     HttpUrl masterUrl = HttpUrl.parse('http://localhost:8080')
@@ -74,7 +74,7 @@ class JenkinsHttpClient  {
                         .url(masterUrl)
                         .get()
                         .build()
-        log.finer("Calling http ${request}")
+        log.debug("Calling http ${request}")
         def resp = newClient().newCall(request).execute()
         try {
             if (!resp.successful) {

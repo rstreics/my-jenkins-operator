@@ -9,10 +9,10 @@ import com.agilestacks.jenkins.operator.resources.GithubOrganization
 import com.agilestacks.jenkins.operator.resources.GithubServer
 import com.agilestacks.jenkins.operator.resources.Pipeline
 import com.agilestacks.jenkins.operator.resources.Plugin
-import groovy.util.logging.Log
+import groovy.util.logging.Slf4j
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
 
-@Log
+@Slf4j
 class Main {
     static final DEFAULT_NAMESPACE = 'jenkins'
     static final MAX_RETRY = 60
@@ -132,5 +132,6 @@ class Main {
 //        controller.watch(Kubernetes)
 
         rateLimiter.startAtFixedRate()
+        log.info'Started'
     }
 }

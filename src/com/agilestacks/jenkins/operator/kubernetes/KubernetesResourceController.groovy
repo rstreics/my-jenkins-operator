@@ -2,6 +2,7 @@ package com.agilestacks.jenkins.operator.kubernetes
 
 import com.agilestacks.jenkins.operator.jenkins.JenkinsHttpClient
 import com.agilestacks.jenkins.operator.util.ScriptableResource
+import groovy.util.logging.Slf4j
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
 import io.fabric8.kubernetes.client.KubernetesClientException
@@ -10,7 +11,6 @@ import io.fabric8.kubernetes.client.dsl.base.OperationSupport
 import io.fabric8.kubernetes.client.dsl.internal.CustomResourceDefinitionOperationsImpl
 import okhttp3.Request
 import okhttp3.RequestBody
-import groovy.util.logging.Slf4j
 
 import java.lang.reflect.Constructor
 

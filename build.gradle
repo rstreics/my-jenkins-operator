@@ -91,7 +91,7 @@ dependencies {
     compile 'commons-cli:commons-cli:1.2'
     compile 'io.sundr:sundr-annotations:0.0.25'
     compile 'org.aspectj:aspectjrt:1.9.1'
-    compile 'org.slf4j:slf4j-nop:1.7.25'
+    compile 'org.slf4j:slf4j-simple:1.8.0-beta2'
 
     compileOnly 'org.jenkins-ci.main:jenkins-core:2.117'
     compileOnly 'org.csanchez.jenkins.plugins:kubernetes:1.5.2'
