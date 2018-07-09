@@ -1,7 +1,6 @@
 #!/usr/bin/env groovy
 import io.fabric8.kubernetes.api.model.ConfigMap
 import jenkins.model.*
-import java.util.logging.Logger
 import java.io.*
 
 import io.fabric8.kubernetes.api.model.NamespaceBuilder
@@ -17,9 +16,6 @@ import java.nio.file.Files
 import jenkins.model.Jenkins
 import net.sf.json.JSONObject
 import org.jenkinsci.plugins.plaincredentials.impl.*
-import java.util.logging.Logger
-
-def log = Logger.getLogger(this.class.name)
 
 def client = new DefaultKubernetesClient(new ConfigBuilder().build())
 if (!client.masterUrl || !client.namespace) {
@@ -34,42 +30,42 @@ def configmap = client.
                 qualifier: 'slack'
         ]).list().items[0]?.data
 
-if (!configmap) {
-    println 'Cannot find slack configmap'
-    return
-}
-
-def slackCredentialParameters = [
-        description:  'Slack Jenkins integration token',
-        id:           'slack-token',
-        secret:       configmap.slackToken
-]
+//if (!configmap) {
+//    println 'Cannot find slack configmap'
+//    return
+//}
 
 def slackParameters = [
-        slackBaseUrl:             configmap.slackBaseUrl,
+        slackBaseUrl:             configmap?.slackBaseUrl ?: '',
         slackBotUser:             'true',
-        slackBuildServerUrl:      configmap.slackBuildServerUrl,
-        slackRoom:                configmap.slackRoom ?: '#jenkins',
-        slackSendAs:              configmap.slackSendAs ?: 'Jenkins',
-        slackTeamDomain:          configmap.slackTeamDomain,
+        slackBuildServerUrl:      configmap?.slackBuildServerUrl ?: '',
+        slackRoom:                configmap?.slackRoom ?: '',
+        slackSendAs:              configmap?.slackSendAs ?: 'Jenkins',
+        slackTeamDomain:          configmap?.slackTeamDomain ?: '',
         slackToken:               '',
-        slackTokenCredentialId:   'slack-token'
+        slackTokenCredentialId:   ''
 ]
 
 Jenkins jenk = Jenkins.getInstance()
-def domain = Domain.global()
-def store = jenk.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
-def slack = jenk.getExtensionList(jenkins.plugins.slack.SlackNotifier.DescriptorImpl.class)[0]
-def secretText = new StringCredentialsImpl(
-        CredentialsScope.GLOBAL,
-        slackCredentialParameters.id,
-        slackCredentialParameters.description,
-        Secret.fromString(slackCredentialParameters.secret)
-)
+final slack = jenk.getExtensionList(jenkins.plugins.slack.SlackNotifier.DescriptorImpl.class)[0]
 
-JSONObject formData = ['slack': ['tokenCredentialId': 'slack-token']] as JSONObject
+JSONObject formData = ['slack': ['tokenCredentialId': '']]
+if (configmap?.slackToken) {
+    final secretText = new StringCredentialsImpl(
+        CredentialsScope.GLOBAL,
+        'slack-token',
+        'Slack Jenkins integration token',
+        Secret.fromString(configmap?.slackToken)
+    )
+    slackParameters['slackParameters'] = secretText.id
+
+    final domain = Domain.global()
+    final store = jenk.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
+    store.addCredentials(domain, secretText)
+    formData.slack.tokenCredentialId = secretText.id
+}
+
 def request = [getParameter: { name -> slackParameters[name] }] as org.kohsuke.stapler.StaplerRequest
-store.addCredentials(domain, secretText)
 slack.configure(request, formData)
 
 // save to disk
