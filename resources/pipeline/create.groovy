@@ -9,14 +9,14 @@ import org.jenkinsci.plugins.workflow.cps.*
 import org.jenkinsci.plugins.workflow.job.*
 import com.cloudbees.hudson.plugins.folder.*
 
-final NAME           = '{{metadata.name}}' ?: null
+final NAME           = '{{spec.name}}' ?: '{{metadata.name}}' ?: null
 final URL            = '{{spec.repositoryUrl}}' ?: null
 final BRANCH_SPEC    = '{{spec.branchSpec}}' ?: null
 final JENKINSFILE    = '{{spec.pipeline}}' ?: null
 final CREDENTIALS_ID = '{{spec.credentialsId}}' ?: null
 final FOLDER         = '{{spec.folder}}' ?: null
 final START_BUILD    = '{{spec.startBuild}}'.toBoolean()
-final ORIGIN         = '{{spec.origin}}' ?: null
+final ORIGIN         = '{{spec.origin}}' ?: 'Agile Stacks Superhub'
 final PARAMS_BASE64  = '''{{paramsBase64}}'''.trim()
 
 def folderName(def folder) {
@@ -77,7 +77,7 @@ if (!found) {
     Jenkins.get().reload()
     if (START_BUILD) {
         if (!job.inQueue) {
-            int delay = 0
+            final delay = 5000
             final cause = new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}")
             final action = new CauseAction(cause)
             job.scheduleBuild2(delay, action)
