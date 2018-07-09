@@ -107,6 +107,8 @@ class Main {
         kubernetesClient.rootPaths()
         log.info "Connected"
 
+        rateLimiter.startAtFixedRate()
+
         controller.apply(Pipeline)
         controller.watch(Pipeline)
 
@@ -131,7 +133,6 @@ class Main {
 //        controller.apply(Kubernetes)
 //        controller.watch(Kubernetes)
 
-        rateLimiter.startAtFixedRate()
         log.info'Started'
     }
 }

@@ -76,7 +76,7 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
         try {
             def crd = kubernetes.customResourceDefinitions().withName(name).get()
             kubernetes.customResources(crd, resource.class, ScriptableResource.List, ScriptableResource.Done).watch(this)
-            log.info("Watching ${name}")
+            log.info("Watching: ${name}")
         } catch (KubernetesClientException err) {
             log.error "Unable watch CRD: ${name}. Moving o", err
         }
