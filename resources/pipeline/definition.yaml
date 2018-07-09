@@ -46,3 +46,6 @@ spec:
               type: boolean
             origin:
               type: string
+            delay:
+              type: number
+              nullable: true

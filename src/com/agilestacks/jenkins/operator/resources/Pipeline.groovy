@@ -15,7 +15,8 @@ class Pipeline extends CustomResource implements ScriptableResource {
         branchSpec: '*/master',
         pipeline  : 'Jenkinsfile',
         origin    : 'agilestacks.io',
-        startBuild: true
+        startBuild: true,
+        delay: 5
     ]
 
     @Override

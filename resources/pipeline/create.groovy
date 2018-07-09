@@ -17,6 +17,7 @@ final CREDENTIALS_ID = '{{spec.credentialsId}}' ?: null
 final FOLDER         = '{{spec.folder}}' ?: null
 final START_BUILD    = '{{spec.startBuild}}'.toBoolean()
 final ORIGIN         = '{{spec.origin}}' ?: 'Agile Stacks Superhub'
+final QUIET_PERIOD   = '{{spec.delay}}'
 final PARAMS_BASE64  = '''{{paramsBase64}}'''.trim()
 
 def folderName(def folder) {
@@ -77,7 +78,12 @@ if (!found) {
     Jenkins.get().reload()
     if (START_BUILD) {
         if (!job.inQueue) {
-            final afterSecs = 5
+            final afterSecs
+            if (QUIET_PERIOD.empty) {
+                afterSecs = 5
+            } else {
+                afterSecs = QUIET_PERIOD.toInteger()
+            }
             final cause = new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}")
             final action = new CauseAction(cause)
             job.scheduleBuild2(afterSecs, action)
