@@ -15,6 +15,11 @@ push:
 	docker push $(IMAGE):$(TAG)
 .PHONY: push
 
+push-experimental:
+	docker tag $(IMAGE):$(TAG) $(IMAGE):experimental
+	docker push $(IMAGE):experimental
+.PHONY: push-experimental
+
 deploy: make push
 
 .PHONY: deploy
