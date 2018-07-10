@@ -78,15 +78,31 @@ if (!found) {
     Jenkins.get().reload()
     if (START_BUILD) {
         if (!job.inQueue) {
-            final afterSecs
+            final delay
             if (QUIET_PERIOD.empty) {
-                afterSecs = 5
+                delay = 5 // seconds
             } else {
-                afterSecs = QUIET_PERIOD.toInteger()
+                delay = QUIET_PERIOD.toInteger()
             }
-            final cause = new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}")
-            final action = new CauseAction(cause)
-            job.scheduleBuild2(afterSecs, action)
+//            final cause = new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}")
+//            final action = new CauseAction(cause)
+
+            def withParams = new ParametersAction()
+            def withCause =  new CauseAction(new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}"))
+//            def causeAction = new hudson.model.CauseAction( new hudson.model.Cause.UpstreamCause() )
+
+
+            Jenkins.get().queue.schedule(job, delay, withCause, withParams)
+
+            final future = job.scheduleBuild2(delay)
+            job.builds.add( future )
+            job.save()
+
+//            final enqueued = Jenkins.get().queue.items.collect() { it.task.name }
+//            println "Currently eunqueued jobs: ${enqueued}"
+//            if ( !(job.name in enqueued) ) {
+//                Jenkins.get().queue.schedule(job)
+//            }
             println "${pipeline}: automated build process"
         }
     } else {
