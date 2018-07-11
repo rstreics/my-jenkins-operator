@@ -70,8 +70,9 @@ if (!found) {
             }
             throw new RuntimeException("Unsupported parameter type: ${type}")
         }
-        job.addProperty( new ParametersDefinitionProperty( paramDefs ) )
-
+        if (paramDefs) {
+            job.addProperty(new ParametersDefinitionProperty(paramDefs))
+        }
     }
     job.definition = new CpsScmFlowDefinition(scm, JENKINSFILE )
     Jenkins.get().reload()
