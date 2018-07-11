@@ -3,7 +3,6 @@ package pipelines
 import jenkins.model.*
 import hudson.model.*
 import groovy.json.JsonSlurper
-import java.util.logging.Logger
 import hudson.plugins.git.*
 import org.jenkinsci.plugins.workflow.cps.*
 import org.jenkinsci.plugins.workflow.job.*
@@ -44,7 +43,7 @@ def createFolder(String name) {
     return parent.createProject(com.cloudbees.hudson.plugins.folder.Folder, parts[-1])
 }
 
-def allJobs = Jenkins.get().getAllItems(AbstractProject)
+def allJobs = Jenkins.get().getAllItems(Job)
 def found = allJobs.find { job -> job.name == NAME }
 if (!found) {
     def parent = Jenkins.get()
@@ -57,7 +56,7 @@ if (!found) {
     final repos = GitSCM.createRepoList(URL, CREDENTIALS_ID)
     final branchSpec = new BranchSpec( BRANCH_SPEC )
     final scm = new GitSCM(repos, [branchSpec], false, [], null, null, [])
-    final job = new WorkflowJob(parent, NAME)
+    final job = parent.createProject(WorkflowJob, NAME)
     if (PARAMS_BASE64) {
         final params = new JsonSlurper().parse(PARAMS_BASE64.decodeBase64())
         final paramDefs = params.collect {
@@ -84,32 +83,20 @@ if (!found) {
             } else {
                 delay = QUIET_PERIOD.toInteger()
             }
-//            final cause = new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}")
-//            final action = new CauseAction(cause)
-
-            def withParams = new ParametersAction()
-            def withCause =  new CauseAction(new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}"))
-//            def causeAction = new hudson.model.CauseAction( new hudson.model.Cause.UpstreamCause() )
-
-
-            Jenkins.get().queue.schedule(job, delay, withCause, withParams)
-
-            final future = job.scheduleBuild2(delay)
-            job.builds.add( future )
             job.save()
 
-//            final enqueued = Jenkins.get().queue.items.collect() { it.task.name }
-//            println "Currently eunqueued jobs: ${enqueued}"
-//            if ( !(job.name in enqueued) ) {
-//                Jenkins.get().queue.schedule(job)
-//            }
-            println "${pipeline}: automated build process"
+            def params = new ParametersAction()
+            def cause =  new CauseAction(
+                new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}"),
+                new Cause.UserIdCause()
+            )
+            job.scheduleBuild2(delay, cause, params)
         }
     } else {
-        println "${pipeline}: skipping automated build due to user setting"
+        println "${NAME}: skipping automated build due to user setting"
     }
 } else {
-    println '${pipeline} already exists! Moving on'
+    println "${NAME} already exists! Moving on"
 }
 
 println 'Status: CONVERGED <EOF>'
