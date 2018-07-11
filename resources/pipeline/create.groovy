@@ -87,7 +87,7 @@ if (!found) {
 
             def params = new ParametersAction()
             def cause =  new CauseAction(
-                new Cause.RemoteCause(ORIGIN, "Started automatically by ${ORIGIN}"),
+                new Cause.RemoteCause(ORIGIN, "First build"),
                 new Cause.UserIdCause()
             )
             job.scheduleBuild2(delay, cause, params)
