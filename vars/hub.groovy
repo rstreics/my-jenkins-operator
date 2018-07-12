@@ -11,7 +11,7 @@ def elaborate(Map args=[:]) {
 //    final log = Logger.getLogger('hub')
 //    final env = build.getEnvironment(new LogTaskListener(log, Level.INFO))
     def argv = [
-        manifest: ['./hub.yaml', './hub-aplication.yaml'].find { fileExists( it ) },
+        manifest: ['./hub.yaml', './hub-application.yaml'].find { fileExists( it ) },
         elaborate: 'hub.yaml.elaborate',
         state: 'hub.yaml.state',
     ] << args
