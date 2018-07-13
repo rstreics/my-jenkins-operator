@@ -13,7 +13,7 @@ def elaborate(String args) {
 }
 
 def getParamOrEnvvarValue(String name) {
-    Run build = null
+    Run build = $build()
     final params = build.getAction( ParametersAction )?.parameters ?: []
     final log = Logger.getLogger(this.class.name)
     return params.find { it.name == name }?.value ?:
