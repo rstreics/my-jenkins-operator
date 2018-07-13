@@ -14,26 +14,20 @@ def elaborate(String args) {
 
 def getParamOrEnvvarValue(String name) {
     Run build = null
-    final param = build.getAction( ParametersAction )?.parameters*.find {
-        it.name == name
-    }
+    final params = build.getAction( ParametersAction )?.parameters ?: []
     final log = Logger.getLogger(this.class.name)
-    return param?.value ?:
+    return params.find { it.name == name }?.value ?:
             build.getEnvironment(new LogTaskListener(log, Level.INFO)).get()
 }
 
 def elaborate(Map args=[:]) {
-//    Run build = $build()
-//    final log = Logger.getLogger('hub')
-//    final env = build.getEnvironment(new LogTaskListener(log, Level.INFO))
-    def argv = [
+    final argv = [
         manifest: ['./hub.yaml', './hub-application.yaml', './hub-component.yaml'].find { fileExists( it ) },
         elaborate: 'hub.yaml.elaborate',
         state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
     ] << args
 
-    def result = sh( returnStatus: true,
-                     script: "hub elaborate ${argv.manifest} -s ${argv.state} -o ${argv.elaborate}" )
+    final result = sh( returnStatus: true, script: "hub elaborate ${argv.manifest} -s ${argv.state} -o ${argv.elaborate}" )
     if (result != 0) {
         throw new RuntimeException("Error [code: ${result}] during hub elaborate")
     }
@@ -45,13 +39,12 @@ def deploy(String arg) {
 }
 
 def deploy(Map args=[:]) {
-    def argv = [
+    final argv = [
         elaborate: 'hub.yaml.elaborate',
         state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
     ] << args
 
-    def result = sh( returnStatus: true,
-        script: "hub deploy --git-outputs=false ${argv.elaborate} -s ${argv.state}" )
+    final result = sh( returnStatus: true, script: "hub deploy --git-outputs=false ${argv.elaborate} -s ${argv.state}" )
     if (result != 0) {
         throw new RuntimeException("Error [code: ${result}] during hub deploy")
     }
@@ -62,14 +55,14 @@ def explain(String arg) {
 }
 
 def explain(Map args=[:]) {
-    def argv = [
+    final argv = [
         elaborate: 'hub.yaml.elaborate',
         state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
         tag: 'hub',
     ] << args
 
-    def content = sh(script: "hub explain ${argv.elaborate} ${argv.state} --json | jq -cM .", returnStdout: true).trim()
-    def result = sh(script: 'echo -n $?', returnStdout: true).trim()
+    final content = sh(script: "hub explain ${argv.elaborate} ${argv.state} --json | jq -cM .", returnStdout: true).trim()
+    final result = sh(script: 'echo -n $?', returnStdout: true).trim()
     if (result != '0') {
         echo "hub explain finished with: ${result}\n---\n${content}"
         throw new RuntimeException("Error [code: ${result}] during hub explain:\n${content}")
