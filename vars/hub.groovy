@@ -1,9 +1,25 @@
 #!/usr/bin/env groovy
 
 import groovy.json.JsonSlurperClassic
+import hudson.model.ParametersAction
+import hudson.model.Run
+import hudson.util.LogTaskListener
+
+import java.util.logging.Level
+import java.util.logging.Logger
 
 def elaborate(String args) {
     elaborate(elaborate: args)
+}
+
+def getParamOrEnvvarValue(String name) {
+    Run build = null
+    final param = build.getAction( ParametersAction )?.parameters*.find {
+        it.name == name
+    }
+    final log = Logger.getLogger(this.class.name)
+    return param?.value ?:
+            build.getEnvironment(new LogTaskListener(log, Level.INFO)).get()
 }
 
 def elaborate(Map args=[:]) {
@@ -13,7 +29,7 @@ def elaborate(Map args=[:]) {
     def argv = [
         manifest: ['./hub.yaml', './hub-application.yaml', './hub-component.yaml'].find { fileExists( it ) },
         elaborate: 'hub.yaml.elaborate',
-        state: 'hub.yaml.state',
+        state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
     ] << args
 
     def result = sh( returnStatus: true,
@@ -31,7 +47,7 @@ def deploy(String arg) {
 def deploy(Map args=[:]) {
     def argv = [
         elaborate: 'hub.yaml.elaborate',
-        state: 'hub.yaml.state',
+        state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
     ] << args
 
     def result = sh( returnStatus: true,
@@ -48,7 +64,7 @@ def explain(String arg) {
 def explain(Map args=[:]) {
     def argv = [
         elaborate: 'hub.yaml.elaborate',
-        state: 'hub.yaml.state',
+        state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
         tag: 'hub',
     ] << args
 
