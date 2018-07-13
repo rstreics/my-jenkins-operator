@@ -42,3 +42,11 @@ def commitHash(args=[:]) {
     }
     return sh(script: 'git rev-parse --long HEAD', returnStdout: true).trim()
 }
+
+def getShortCommit() {
+    return commitHash(short: true)
+}
+
+def getLongCommit() {
+    return commitHash(short: false)
+}
