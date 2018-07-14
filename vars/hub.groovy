@@ -29,7 +29,7 @@ def elaborate(Map args=[:]) {
 
     final result = sh( returnStatus: true, script: "hub elaborate ${argv.manifest} -s ${argv.state} -o ${argv.elaborate}" )
     if (result != 0) {
-        throw new RuntimeException("Error [code: ${result}] during hub elaborate")
+        error "Error [code: ${result}] during hub elaborate"
     }
     return result
 }
@@ -46,7 +46,7 @@ def deploy(Map args=[:]) {
 
     final result = sh( returnStatus: true, script: "hub deploy --git-outputs=false ${argv.elaborate} -s ${argv.state}" )
     if (result != 0) {
-        throw new RuntimeException("Error [code: ${result}] during hub deploy")
+        error "hub deploy finished with error [code: ${result}]"
     }
 }
 
@@ -64,8 +64,37 @@ def explain(Map args=[:]) {
     final content = sh(script: "hub explain ${argv.elaborate} ${argv.state} --json | jq -cM .", returnStdout: true).trim()
     final result = sh(script: 'echo -n $?', returnStdout: true).trim()
     if (result != '0') {
-        echo "hub explain finished with: ${result}\n---\n${content}"
-        throw new RuntimeException("Error [code: ${result}] during hub explain:\n${content}")
+        error "hub explain finished with error [code: ${result}]\n---\n${content}"
     }
     return new JsonSlurperClassic().parseText(content as String)
+}
+
+def render(String template, Map additional=[:]) {
+    render([template: template, additional: additional])
+}
+
+def render(Map args=[:]) {
+    final argv = [
+        elaborate: 'hub.yaml.elaborate',
+        state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
+    ] << args
+
+    if (!argv.template || !fileExists(argv.template)) {
+        error "Cannot find template file: ${argv.template}"
+    }
+
+    def command = "hub render ${argv.template} -m ${argv.elaborate} -s ${argv.state}"
+    if (argv.component) {
+        command += " -c ${argv.component}"
+    }
+
+    if (argv.additional) {
+        command += " -a ${argv.additional.collect {k, v -> "${k}=${v}"}.join(',')}"
+    }
+
+    final result = sh returnStatus: true, script: command
+    if (result != 0) {
+        error "hub render finished with error [code: ${result}]"
+    }
+    return result
 }
