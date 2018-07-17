@@ -11,7 +11,7 @@ if (found) {
     println "Deleting job: ${NAME}"
     found.
         builds.
-        findAll { it.building }.
+        findAll { it.building && it.executor }.
         each {
             def cause = new CauseOfInterruption() {
                 String shortDescription = "Interrupted by Operator"
@@ -20,7 +20,7 @@ if (found) {
         }
     print 'Giving up to 60 sec to cool down'
     for (i in 0..60) {
-        def building = found.builds.find {it.building}
+        def building = found.builds.find {it.building && it.executor}
         if (!building) {
             break
         }
