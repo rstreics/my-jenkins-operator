@@ -6,7 +6,7 @@ import groovy.json.JsonSlurper
 import hudson.plugins.git.*
 import org.jenkinsci.plugins.workflow.cps.*
 import org.jenkinsci.plugins.workflow.job.*
-import com.cloudbees.hudson.plugins.folder.*
+import com.cloudbees.hudson.plugins.folder.Folder
 
 final NAME           = '{{spec.name}}' ?: '{{metadata.name}}' ?: null
 final URL            = '{{spec.repositoryUrl}}' ?: null
@@ -27,7 +27,7 @@ def folderName(def folder) {
 }
 
 def createFolder(String name) {
-    def allFolders = Jenkins.get().getAllItems(com.cloudbees.hudson.plugins.folder.Folder)
+    def allFolders = Jenkins.get().getAllItems(Folder)
     def exist = allFolders.find { folderName(it) == name }
     if (exist) {
         return exist
@@ -40,7 +40,7 @@ def createFolder(String name) {
         parent = createFolder(parentFolder)
     }
     println "Creating folder: ${parts[-1]}"
-    return parent.createProject(com.cloudbees.hudson.plugins.folder.Folder, parts[-1])
+    return parent.createProject(Folder, parts[-1])
 }
 
 def allJobs = Jenkins.get().getAllItems(Job)
@@ -86,12 +86,11 @@ if (!found) {
             }
             job.save()
 
-            def params = new ParametersAction()
             def cause =  new CauseAction(
                 new Cause.RemoteCause(ORIGIN, "First build"),
                 new Cause.UserIdCause()
             )
-            job.scheduleBuild2(delay, cause, params)
+            job.scheduleBuild2(delay, cause)
         }
     } else {
         println "${NAME}: skipping automated build due to user setting"
