@@ -6,8 +6,12 @@ NAMESPACE ?= jenkins
 
 kubectl := kubectl
 
+jenkins-operator-cache:
+	docker build --target=$@ --tag $@ .
+.PHONY: jenkins-operator-cache
+
 build:
-	docker build -t $(IMAGE):latest -t $(IMAGE):$(TAG) .
+	docker build --cache-from=jenkins-operator-cache -t $(IMAGE):latest -t $(IMAGE):$(TAG) .
 .PHONY: build
 
 push:

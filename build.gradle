@@ -33,6 +33,10 @@ configurations {
     ivy
 }
 
+task downloadJars(type: Copy) {
+    from sourceSets.main.runtimeClasspath
+    into 'runtime/'
+}
 
 mainClassName = 'com.agilestacks.jenkins.operator.Main'
 
