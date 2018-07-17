@@ -17,7 +17,7 @@ def getParamOrEnvvarValue(String name) {
     final params = build.getAction( ParametersAction )?.parameters ?: []
     final log = Logger.getLogger(this.class.name)
     return params.find { it.name == name }?.value ?:
-            build.getEnvironment(new LogTaskListener(log, Level.INFO)).get()
+            build.getEnvironment(new LogTaskListener(log, Level.INFO)).get(name)
 }
 
 def elaborate(Map args=[:]) {
