@@ -63,7 +63,7 @@ if (!found) {
             def type = it.type.trim() ?: 'string'
             println "Add parameter ${type}:${it.name}"
             if (type == 'string') {
-                return new StringParameterDefinition(it.name, it.defaultValue, it.description)
+                return new StringParameterDefinition(it.name, "${it.defaultValue}", it.description)
             }
             if (type == 'boolean') {
                 return new BooleanParameterDefinition(it.name, it.defaultValue ?: false, it.description)
