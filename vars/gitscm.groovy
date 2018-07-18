@@ -36,7 +36,7 @@ def getBranch() {
 }
 
 def commitHash(args=[:]) {
-    final arv = [short: true] << args
+    final argv = [short: true] << args
     if (argv.short) {
         return sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
     }
