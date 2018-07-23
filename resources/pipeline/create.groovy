@@ -75,22 +75,13 @@ if (!found) {
         }
     }
     job.definition = new CpsScmFlowDefinition(scm, JENKINSFILE )
-    Jenkins.get().reload()
     if (START_BUILD) {
         if (!job.inQueue) {
-            final delay
-            if (QUIET_PERIOD.empty) {
-                delay = 5 // seconds
-            } else {
-                delay = QUIET_PERIOD.toInteger()
-            }
-            job.save()
-
-            def cause =  new CauseAction(
-                new Cause.RemoteCause(ORIGIN, "First build"),
-                new Cause.UserIdCause()
-            )
-            job.scheduleBuild2(delay, cause)
+//            def cause =  new CauseAction(
+//                new Cause.RemoteCause(ORIGIN, "First build"),
+//                new Cause.UserIdCause()
+//            )
+            job.scheduleBuild2(QUIET_PERIOD.empty ? 5 : QUIET_PERIOD.toInteger())
         }
     } else {
         println "${NAME}: skipping automated build due to user setting"
