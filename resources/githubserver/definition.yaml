@@ -18,7 +18,6 @@ spec:
     status: {}
   validation:
     openAPIV3Schema:
-      type: object
       properties:
         spec:
           type: object
@@ -28,23 +27,11 @@ spec:
             apiUrl:
               type: string
               pattern: '(https?)(:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)'
-              nullable: true
             username:
               type: string
-              nullable: false
             organization:
               type: string
-              nullable: false
             credentialsId:
               type: string
-              nullable: true
             manageHooks:
               type: boolean
-              nullable: true
-#
-#
-#data:
-#  apiUrl: https://api.github.com
-#  organization: agilestacks
-#  credentialsId: asibot
-#  username: asibot

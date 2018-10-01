@@ -22,6 +22,5 @@ spec:
               pattern: '(ours|their)'
 #              default: 'ours'
             variables:
-              nullable: false
               type: object
               properties: {}

@@ -18,34 +18,34 @@ spec:
     status: {}
   validation:
     openAPIV3Schema:
-      type: object
       properties:
         spec:
-          type: object
-          required:
-          - repositoryUrl
+          required: ['repositoryUrl']
           properties:
             repositoryUrl:
               type: string
               pattern: '(https?)(:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)'
-              nullable: false
+              description: "URL to the source code repository with application and pipeline"
             name:
               type: string
-              nullable: true
+              description: "Name of the Jenkins job"
             branchSpec:
               type: string
+              description: "SCM branch spec. Defaults to master"
             pipeline:
               type: string
+              description: "Reference to Jenkinsfile in the repository"
             credentialsId:
               type: string
-              nullable: true
+              description: "Reference to Jenkinsfile in the repository"
             folder:
               type: string
-              nullable: true
+              description: "Create a Jenkins folder and put pipeline there if not empty"
             startBuild:
               type: boolean
+              description: "If true, then start build after pipeline will has been created"
             origin:
               type: string
             delay:
               type: number
-              nullable: true
+              description: "Number of seconds to delay first build (to give configuration to settle down)"

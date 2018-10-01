@@ -1,7 +1,7 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: kuberntes.jenkins.agilestacks.com
+  name: kubernetes.jenkins.agilestacks.com
 spec:
   group: jenkins.agilestacks.com
   version: v1
@@ -18,7 +18,6 @@ spec:
     status: {}
   validation:
     openAPIV3Schema:
-      type: object
       properties:
         spec:
           type: object
@@ -28,7 +27,6 @@ spec:
             baseUrl:
               type: string
               pattern: '(https?)(:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)'
-              nullable: false
             name:
               type: string
             credentialsId:
