@@ -22,7 +22,7 @@ def getParamOrEnvvarValue(String name) {
 
 def elaborate(Map args=[:]) {
     final argv = [
-        manifest: ['hub.yaml', 'hub-application.yaml', 'hub-component.yaml'].find { fileExists( it ) } ?: 'hub.yaml',
+        manifest: ['hub.yaml', 'hub-application.yaml', 'hub-component.yaml', '.hub/hub.yaml'].find { fileExists( it ) } ?: 'hub.yaml',
         elaborate: 'hub.yaml.elaborate',
         state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
     ] << args
