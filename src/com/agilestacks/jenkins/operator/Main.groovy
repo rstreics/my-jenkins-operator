@@ -8,6 +8,7 @@ import com.agilestacks.jenkins.operator.resources.EnvVars
 import com.agilestacks.jenkins.operator.resources.GithubOrganization
 import com.agilestacks.jenkins.operator.resources.GithubServer
 import com.agilestacks.jenkins.operator.resources.Pipeline
+import com.agilestacks.jenkins.operator.resources.PipelineLibrary
 import com.agilestacks.jenkins.operator.resources.Plugin
 import groovy.util.logging.Slf4j
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
@@ -111,6 +112,9 @@ class Main {
 
         controller.apply(Pipeline)
         controller.watch(Pipeline)
+
+        controller.apply(PipelineLibrary)
+        controller.watch(PipelineLibrary)
 
         controller.apply(EnvVars)
         controller.watch(EnvVars)

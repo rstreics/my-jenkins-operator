@@ -7,7 +7,7 @@ spec:
   version: v1
   scope: Namespaced
   names:
-    plural: pipelines
+    plural: pipeline
     singular: pipeline
     kind: Pipeline
     categories:

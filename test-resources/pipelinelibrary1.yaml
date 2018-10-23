@@ -1,0 +1,14 @@
+apiVersion: "jenkins.agilestacks.com/v1"
+kind: PipelineLibrary
+metadata:
+  name: test-pipelinelibrary1
+spec:
+  name: gitexample
+  version: master
+  implicit: false
+  overrideVersion: true
+  includeChangeSet: true
+  retrieval:
+    git:
+      repositoryUrl: https://github.com/agilestacks/jenkins.git
+      credentialsId: ~

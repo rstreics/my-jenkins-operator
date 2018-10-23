@@ -1,0 +1,15 @@
+apiVersion: "jenkins.agilestacks.com/v1"
+kind: PipelineLibrary
+metadata:
+  name: test-pipelinelibrary2
+spec:
+  name: filesystemexample
+  version: master
+  implicit: true
+  overrideVersion: true
+  includeChangeSet: true
+  retrieval:
+    fileSystem:
+      path: /path/to/library
+      clearWorkspace: true
+      copyHiddenFiles: true

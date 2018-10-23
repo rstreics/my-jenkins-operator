@@ -68,11 +68,6 @@ class KubernetesResourceController<T extends ScriptableResource> implements Watc
     def watch(ScriptableResource resource) {
         String name = resource.definition.metadata.name
 
-        def existing = crd.list().items
-        if ( !existing.find{it.metadata.name == name} ) {
-            throw new RuntimeException("Cannot find CRD: ${name}")
-        }
-
         try {
             def crd = kubernetes.customResourceDefinitions().withName(name).get()
             kubernetes.customResources(crd, resource.class, ScriptableResource.List, ScriptableResource.Done).watch(this)

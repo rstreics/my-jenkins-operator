@@ -1,0 +1,71 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: pipelineliraries.jenkins.agilestacks.com
+spec:
+  group: jenkins.agilestacks.com
+  version: v1
+  scope: Namespaced
+  names:
+    plural: pipelineliraries
+    singular: pipelinelirary
+    kind: PipelineLibrary
+    shortNames:
+    - pipe-lib
+    - pipe-libs
+    - pipelib
+    - pipelibs
+    - pipelinelibs
+    - lib
+    - libs
+    - pipelinelibrary
+    - pipeline-libraries
+  validation:
+    openAPIV3Schema:
+      type: object
+      properties:
+        spec:
+          properties:
+            name:
+              type: string
+            version:
+              type: string
+            implicit:
+              type: boolean
+            allowVersionOverride:
+              type: boolean
+            includeInChangesets:
+              type: boolean
+            retrievalMethod:
+              type: object
+              properties:
+                git:
+                  type: object
+                  properties:
+                    repositoryUrl:
+                      type: string
+                      pattern: '(https?)(:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)'
+                      description: "URL to the source code repository where pipeline library can be found"
+#                    credentialsId:
+#                      type: string
+#                    behaviors:
+#                      type: list
+                    remote:
+                      type: string
+                    includes:
+                      type: string
+                    excludes:
+                      type: string
+                fileSystem:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      pattern: '^(/[^/ ]*)+/?$'
+                      description: "File system path where Jenkins Master can reach pipeline library"
+                    clearWorkspace:
+                      type: boolean
+                      description: "Clear workspace before build"
+                    copyHidden:
+                      type: string
+                      description: "Copy hidden files"

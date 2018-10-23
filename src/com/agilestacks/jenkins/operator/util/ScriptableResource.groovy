@@ -15,6 +15,8 @@ import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition
 import io.fabric8.kubernetes.client.KubernetesClient
 import io.fabric8.kubernetes.client.utils.Serialization
 
+import static com.agilestacks.jenkins.operator.util.Utils.*
+
 @Log
 @JsonDeserialize(using = JsonDeserializer.None.class)
 trait ScriptableResource implements HasMetadata {
@@ -64,7 +66,7 @@ trait ScriptableResource implements HasMetadata {
     Map<String, ?> getMergedWithDefaults() {
         [kind: kind,
          apiVersion: apiVersion,
-         spec: getDefaults() + getSpec(),
+         spec: deepMerge(getDefaults(), getSpec()),
          metadata: metadata.properties]
     }
 
