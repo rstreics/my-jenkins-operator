@@ -24,7 +24,7 @@ if (GlobalLibraries.get().libraries.find {it.name == NAME}) {
     return
 }
 
-println "Applying pipeline library ${NAME}"
+println "Applying pipeline library ${NAME} ${CREDENTIALS_ID}"
 
 def scm = new GitSCMSource( UUID.randomUUID().toString(),
     REPO_URL,

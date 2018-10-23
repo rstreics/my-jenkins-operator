@@ -7,9 +7,18 @@ spec:
   version: v1
   scope: Namespaced
   names:
-    plural: pipeline
+    plural: pipelines
     singular: pipeline
     kind: Pipeline
+    shortNames:
+    - jp
+    - pipe
+    - pipes
+    - wf
+    - jenkinspipelines
+    - jenkinspipeline
+    - workflows
+    - workflow
     categories:
     - jenkins
     - ci

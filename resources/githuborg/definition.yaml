@@ -14,6 +14,19 @@ spec:
     - jenkins
     - ci
     - github
+    shortNames:
+    - org
+    - orgs
+    - organization
+    - organizations
+    - github-organizations
+    - githuborganizations
+    - github-organization
+    - githuborganization
+    - github-orgs
+    - gh-orgs
+    - ghorgs
+    - ghorg
   subresources:
     status: {}
   validation:
@@ -22,13 +35,8 @@ spec:
         spec:
           type: object
           required:
-          - repositoryUrl
+          - organization
           properties:
-            apiUrl:
-              type: string
-              pattern: '(https?)(:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)'
-            username:
-              type: string
             organization:
               type: string
             credentialsId:

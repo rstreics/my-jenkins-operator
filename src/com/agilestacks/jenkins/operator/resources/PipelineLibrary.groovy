@@ -38,7 +38,7 @@ class PipelineLibrary extends CustomResource implements ScriptableResource {
         if (spec.retrievalMethod?.containsKey('fileSystem')) {
             return '/pipelinelibrary/create-fs.groovy'
         }
-        throw new IllegalArgumentException( "Unsupported credentials type: ${this}" )
+        throw new IllegalArgumentException( "Unsupported pipeline library: ${this}" )
     }
 
     @Override

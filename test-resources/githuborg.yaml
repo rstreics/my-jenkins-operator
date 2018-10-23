@@ -1,0 +1,9 @@
+---
+apiVersion: "jenkins.agilestacks.com/v1"
+kind: GithubOrganization
+metadata:
+  name: asibot
+spec:
+  organization: asibot
+  credentialsId: asibot-creds
+  description: test

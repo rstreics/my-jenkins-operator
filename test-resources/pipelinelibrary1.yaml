@@ -8,7 +8,7 @@ spec:
   implicit: false
   overrideVersion: true
   includeChangeSet: true
-  retrieval:
+  retrievalMethod:
     git:
       repositoryUrl: https://github.com/agilestacks/jenkins.git
       credentialsId: ~

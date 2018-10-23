@@ -8,7 +8,7 @@ spec:
   implicit: true
   overrideVersion: true
   includeChangeSet: true
-  retrieval:
+  retrievalMethod:
     fileSystem:
       path: /path/to/library
       clearWorkspace: true

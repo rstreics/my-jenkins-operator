@@ -12,7 +12,7 @@ import org.jenkinsci.plugins.github_branch_source.*
 
 def log = Logger.getLogger(this.class.name)
 
-final NAME           = '{{metadata.name}}' ?: null
+final NAME           = '{{spec.name}}' ?: '{{metadata.name}}' ?: null
 final API_URL        = '{{spec.apiUrl}}' ?: null
 final ORGANIZATION   = '{{spec.organization}}' ?: NAME
 final CREDENTIALS_ID = '{{spec.credentialsId}}' ?: null
