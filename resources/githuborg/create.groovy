@@ -1,16 +1,10 @@
 package githuborg
 
-import jenkins.*
-import jenkins.model.*
-import hudson.*
-import hudson.model.*
-import java.util.logging.Logger
-import org.jenkinsci.plugins.github.*
-import org.jenkinsci.plugins.github.config.*
-import jenkins.branch.*
-import org.jenkinsci.plugins.github_branch_source.*
-
-def log = Logger.getLogger(this.class.name)
+import jenkins.model.Jenkins
+import jenkins.branch.OrganizationFolder
+import com.cloudbees.jenkins.GitHubWebHook
+import org.jenkinsci.plugins.github_branch_source.GitHubSCMNavigator
+import jenkins.branch.BranchIndexingCause
 
 final NAME           = '{{spec.name}}' ?: '{{metadata.name}}' ?: null
 final API_URL        = '{{spec.apiUrl}}' ?: null
@@ -22,7 +16,8 @@ final SCHEDULE_BUILD = '{{spec.scheduleBuild}}' ?: true
 
 def ofs = Jenkins.get().getAllItems(OrganizationFolder)
 if ( ofs.find { it.name == ORGANIZATION } ) {
-    println 'GitHub ${NAME} already registered! Moving on'
+    println "GitHub ${NAME} already registered! Moving on"
+    println 'Status: CONVERGED <EOF>'
     return
 }
 

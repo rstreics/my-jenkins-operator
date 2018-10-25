@@ -37,3 +37,4 @@ out
 build
 jenkins.iml
 .allure
+.envrc

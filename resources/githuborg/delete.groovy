@@ -1,53 +1,50 @@
-package githuborg
+import jenkins.branch.OrganizationFolder
+import jenkins.model.CauseOfInterruption
+import jenkins.model.Jenkins
 
-import jenkins.*
-import jenkins.model.*
-import hudson.*
-import hudson.model.*
-import java.util.logging.Logger
-import org.jenkinsci.plugins.github.*
-import org.jenkinsci.plugins.github.config.*
-import jenkins.branch.*
-import org.jenkinsci.plugins.github_branch_source.*
+final ORG = '{{spec.organization}}' ?: null
 
-def log = Logger.getLogger(this.class.name)
+def findUnfinishedBuilds(current, results=[]) {
+    if (current.hasProperty('builds')) {
+        results += current.builds.findAll { it.building }
+    }
 
-final NAME           = '{{spec.name}}' ?: '{{metadata.name}}' ?: null
-final API_URL        = '{{spec.apiUrl}}' ?: null
-final ORGANIZATION   = '{{spec.organization}}' ?: NAME
-final CREDENTIALS_ID = '{{spec.credentialsId}}' ?: null
-final SCAN_CREDS_ID  = '{{spec.scanCredentialsId}}' ?: 'SAME'
-final DESCRIPTION    = '{{spec.description}}' ?: "${ORGANIZATION}, Github Organization"
-final SCHEDULE_BUILD = '{{spec.scheduleBuild}}' ?: true
-
-def ofs = Jenkins.get().getAllItems(OrganizationFolder)
-def found =  ofs.find { it.name == ORGANIZATION }
-if (found) {
-    found.
-        builds.
-        findAll { it.building }.
-        each {
-            def cause = new CauseOfInterruption() {
-                String shortDescription = "Interrupted by Operator"
-            }
-            it.executor.interrupt(Result.ABORTED, cause)
+    if (current.hasProperty('items')) {
+        current.items.each {
+            findUnfinishedBuilds(it, results)
         }
+    }
+    return results
+}
 
-    print 'Giving up to 60 sec to cool down'
-    for (i in 0..60) {
-        def building = found.builds.find {it.building}
+final cause = new CauseOfInterruption() { String shortDescription = "Interrupted by Operator" }
+final orgFolder = Jenkins.get().getAllItems(OrganizationFolder).find { it.name == ORG }
+if (!orgFolder) {
+    println "Organization folder ${ORG} not found!"
+    println 'Status: CONVERGED <EOF>'
+    return
+}
+
+
+final unfinishedBuilds = findUnfinishedBuilds(orgFolder)
+if (unfinishedBuilds) {
+    println "Cancelling all builds for ${ORG}"
+    unfinishedBuilds.each {
+        it.executor.interrupt(Result.ABORTED, cause)
+    }
+    print "Waiting 60 sec to settle down "
+
+    // break statement is only allowed inside loops or switches
+    for (_ in 0..60) {
+        sleep(1000)
+        print '.'
+        final building = findUnfinishedBuilds(orgFolder).find{ it.building }
         if (!building) {
             break
         }
-        sleep 1000
-        print '.'
     }
     println 'Done'
-
-    found.delete()
-    Jenkins.get().reload()
 }
 
-Jenkins.get().save()
-
+orgFolder.delete()
 println 'Status: CONVERGED <EOF>'

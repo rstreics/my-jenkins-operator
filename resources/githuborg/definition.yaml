@@ -1,34 +1,29 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: githuborgs.jenkins.agilestacks.com
+  name: githuborganizations.jenkins.agilestacks.com
 spec:
   group: jenkins.agilestacks.com
   version: v1
   scope: Namespaced
   names:
-    plural: githuborgs
-    singular: githuborg
+    plural: githuborganizations
+    singular: githuborganization
     kind: GithubOrganization
-    categories:
-    - jenkins
-    - ci
-    - github
     shortNames:
     - org
     - orgs
     - organization
     - organizations
     - github-organizations
-    - githuborganizations
     - github-organization
-    - githuborganization
+    - githuborg
+    - githuborgs
     - github-orgs
+    - gh-org
     - gh-orgs
     - ghorgs
     - ghorg
-  subresources:
-    status: {}
   validation:
     openAPIV3Schema:
       properties:
