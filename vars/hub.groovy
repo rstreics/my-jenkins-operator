@@ -73,6 +73,10 @@ def render(String template, Map additional=[:]) {
     render([template: template, additional: additional])
 }
 
+def kubeconfig(String arg) {
+    kubeconfig(state: arg)
+}
+
 def kubeconfig(Map args[:]) {
     final argv = [
         state: getParamOrEnvvarValue('PLATFORM_STATE_FILE') ?: 'hub.yaml.state'
@@ -85,7 +89,7 @@ def kubeconfig(Map args[:]) {
 
     final result = sh returnStatus: true, script: command
     if (result != 0) {
-        error "hub render finished with error [code: ${result}]"
+        error "hub kubeconfig finished with error [code: ${result}]"
     }
     return result
 }
