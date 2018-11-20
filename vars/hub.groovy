@@ -73,6 +73,23 @@ def render(String template, Map additional=[:]) {
     render([template: template, additional: additional])
 }
 
+def kubeconfig(Map args[:]) {
+    final argv = [
+        state: getParamOrEnvvarValue('PLATFORM_STATE_FILE') ?: 'hub.yaml.state'
+    ] << args
+
+    if (!argv.state) {
+        error "No Hub state file specified"
+    }
+    def command = "hub kubeconfig ${argv.state}"
+
+    final result = sh returnStatus: true, script: command
+    if (result != 0) {
+        error "hub render finished with error [code: ${result}]"
+    }
+    return result
+}
+
 def render(Map args=[:]) {
     final argv = [
         elaborate: 'hub.yaml.elaborate',
