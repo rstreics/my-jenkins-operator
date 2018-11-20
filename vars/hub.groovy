@@ -77,7 +77,7 @@ def kubeconfig(String arg) {
     kubeconfig(state: arg)
 }
 
-def kubeconfig(Map args[:]) {
+def kubeconfig(Map args=[:]) {
     final argv = [
         state: getParamOrEnvvarValue('PLATFORM_STATE_FILE') ?: 'hub.yaml.state'
     ] << args
