@@ -96,7 +96,7 @@ def kubeconfig(Map args=[:]) {
     if (argv.caCert && argv.clientCert && argv.clientKey 
         && argv.apiEndpoint && argv.domain) {
         sh(returnStatus: false, 
-            script: "echo \"${argv.caCert}\" > caCert.pom; echo \"${argv.clientCert}\" > clientCert.pom; "+
+            script: "#!/bin/sh -e\\n echo \"${argv.caCert}\" > caCert.pom; echo \"${argv.clientCert}\" > clientCert.pom; "+
                 "echo \"${argv.clientKey}\" > clientKey.pom")
         sh(returnStatus: false,
             script: "kubectl config set-cluster ${argv.domain} "+
