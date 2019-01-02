@@ -79,7 +79,8 @@ def kubeconfig(String caCert, String clientCert, String clientKey,
         caCert: caCert, 
         clientCert: clientCert, 
         clientKey: clientKey, 
-        apiEndpoint: apiEndpoint
+        apiEndpoint: apiEndpoint,
+        domain: domain
         ])
 }
 
