@@ -73,6 +73,16 @@ def render(String template, Map additional=[:]) {
     render([template: template, additional: additional])
 }
 
+def kubeconfig(String caCert, String clientCert, String clientKey, 
+    String apiEndpoint, String domain){
+    kubeconfig([
+        caCert: caCert, 
+        clientCert: clientCert, 
+        clientKey: clientKey, 
+        apiEndpoint: apiEndpoint
+        ])
+}
+
 def kubeconfig(String arg) {
     kubeconfig(state: arg)
 }
@@ -82,16 +92,38 @@ def kubeconfig(Map args=[:]) {
         state: getParamOrEnvvarValue('PLATFORM_STATE_FILE') ?: 'hub.yaml.state'
     ] << args
 
-    if (!argv.state) {
-        error "No Hub state file specified"
+    if (argv.caCert && argv.clientCert && argv.clientKey 
+        && argv.apiEndpoint && argv.domain) {
+        sh(returnStatus: false, 
+            script: "echo \"${argv.caCert}\" > caCert.pom; echo \"${argv.clientCert}\" > clientCert.pom; "+
+                "echo \"${argv.clientKey}\" > clientKey.pom")
+        sh(returnStatus: false,
+            script: "kubectl config set-cluster ${argv.domain} "+
+                "--embed-certs=true "+
+                "--server=https://${argv.apiEndpoint} "+
+                "--certificate-authority=caCert.pom")
+        sh(returnStatus: false,
+            script: "kubectl config set-credentials admin@${argv.domain} "+
+                "--embed-certs=true "+
+                "--client-key=clientKey.pom "+
+                "--client-certificate=clientCert.pom")
+        sh(returnStatus: false,
+            script: "kubectl config set-context ${argv.domain}-context "+
+                "--cluster=${argv.domain} "+
+                "--user=admin@${argv.domain} "+
+                "--namespace=kube-system")
+        final result = sh(returnStatus: true,
+            script: "kubectl config use-context ${argv.domain}-context")
+        if (result != 0) {
+            error "kubectl config use-context ${argv.domain}-context exited with error [code: ${result}]"
+        }
+    } else {
+        def command = "hub kubeconfig ${argv.state}"
+        final result = sh returnStatus: true, script: command
+        if (result != 0) {
+            error "hub kubeconfig finished with error [code: ${result}]"
+        }
     }
-    def command = "hub kubeconfig ${argv.state}"
-
-    final result = sh returnStatus: true, script: command
-    if (result != 0) {
-        error "hub kubeconfig finished with error [code: ${result}]"
-    }
-    return result
 }
 
 def render(Map args=[:]) {
