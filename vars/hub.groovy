@@ -56,12 +56,11 @@ def explain(String arg) {
 
 def explain(Map args=[:]) {
     final argv = [
-        elaborate: 'hub.yaml.elaborate',
         state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
         tag: 'hub',
     ] << args
 
-    final content = sh(script: "hub explain ${argv.elaborate} ${argv.state} --json | jq -cM .", returnStdout: true).trim()
+    final content = sh(script: "hub explain ${argv.state} --json | jq -cM .", returnStdout: true).trim()
     final result = sh(script: 'echo -n $?', returnStdout: true).trim()
     if (result != '0') {
         error "hub explain finished with error [code: ${result}]\n---\n${content}"
@@ -129,7 +128,6 @@ def kubeconfig(Map args=[:]) {
 
 def render(Map args=[:]) {
     final argv = [
-        elaborate: 'hub.yaml.elaborate',
         state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
     ] << args
 
@@ -137,7 +135,7 @@ def render(Map args=[:]) {
         error "Cannot find template file: ${argv.template}"
     }
 
-    def command = "hub render ${argv.template} -m ${argv.elaborate} -s ${argv.state}"
+    def command = "hub render ${argv.template} -s ${argv.state}"
     if (argv.component) {
         command += " -c ${argv.component}"
     }
