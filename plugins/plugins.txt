@@ -10,6 +10,6 @@ oic-auth:1.1
 swarm:3.13
 workflow-aggregator:2.5
 pipeline-utility-steps:2.1.0
-display-url-api:2.2.0
+display-url-api:2.3.0
 blueocean-display-url:2.2.0
-durable-task:1.22
+durable-task:1.29
