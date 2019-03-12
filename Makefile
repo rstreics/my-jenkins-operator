@@ -11,14 +11,18 @@ jenkins-operator-cache:
 .PHONY: jenkins-operator-cache
 
 build:
-	docker build --cache-from=jenkins-operator-cache -t $(IMAGE):latest -t $(IMAGE):stable -t $(IMAGE):$(TAG) .
+	docker build --cache-from=jenkins-operator-cache -t $(IMAGE):latest -t $(IMAGE):$(TAG) .
 .PHONY: build
 
 push:
 	docker push $(IMAGE):latest
-	docker push $(IMAGE):stable
 	docker push $(IMAGE):$(TAG)
 .PHONY: push
+
+push-stable:
+	docker tag $(IMAGE):$(TAG) $(IMAGE):stable
+	docker push $(IMAGE):stable
+.PHONY: push-stable
 
 push-experimental:
 	docker tag $(IMAGE):$(TAG) $(IMAGE):experimental
