@@ -25,7 +25,7 @@ push-experimental:
 	docker push $(IMAGE):experimental
 .PHONY: push-experimental
 
-deploy: make push
+deploy: build push
 
 .PHONY: deploy
 	- $(kubectl) create namespace $(NAMESPACE)
