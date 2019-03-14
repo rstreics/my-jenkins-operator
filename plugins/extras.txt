@@ -1,5 +1,5 @@
-slack:2.3
-credentials-binding:1.16
-embeddable-build-status:1.9
-aws-credentials:1.23
-pipeline-aws:1.27
+aws-credentials:1.26
+credentials-binding:1.18
+embeddable-build-status:2.0
+pipeline-aws:1.36
+slack:2.18
