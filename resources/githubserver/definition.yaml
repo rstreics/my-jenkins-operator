@@ -22,7 +22,9 @@ spec:
         spec:
           type: object
           required:
-          - repositoryUrl
+          - apiUrl
+          - username
+          - credentialsId
           properties:
             apiUrl:
               type: string

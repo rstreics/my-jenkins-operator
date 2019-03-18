@@ -1,7 +1,7 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: slack.jenkins.agilestacks.com
+  name: slacks.jenkins.agilestacks.com
 spec:
   group: jenkins.agilestacks.com
   version: v1
@@ -22,7 +22,11 @@ spec:
         spec:
           type: object
           required:
-          - repositoryUrl
+          - baseUrl
+          - botUser
+          - buildServerUrl
+          - teamDomain
+          - credentialsId
           properties:
             baseUrl:
               type: string
@@ -38,4 +42,4 @@ spec:
             teamDomain:
               type: string
             credentialsId:
-              type: boolean
+              type: string
