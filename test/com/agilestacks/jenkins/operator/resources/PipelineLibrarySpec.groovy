@@ -10,7 +10,7 @@ class PipelineLibrarySpec extends Specification implements BasicScriptableRoutin
         def resource = fromYaml('/pipelinelibrary1.yaml', PipelineLibrary)
 
         expect:
-        resource.spec.retrieval.containsKey('git')
+        resource.spec.retrievalMethod.containsKey('git')
         resource.createScriptFilename == '/pipelinelibrary/create-git.groovy'
         resource.createScript =~ MAGIC_STRING
     }
@@ -20,7 +20,7 @@ class PipelineLibrarySpec extends Specification implements BasicScriptableRoutin
         def resource = fromYaml('/pipelinelibrary2.yaml', PipelineLibrary)
 
         expect:
-        resource.spec.retrieval.containsKey('fileSystem')
+        resource.spec.retrievalMethod.containsKey('fileSystem')
         resource.createScriptFilename == '/pipelinelibrary/create-fs.groovy'
         resource.createScript =~ MAGIC_STRING
     }
