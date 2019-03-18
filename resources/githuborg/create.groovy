@@ -21,7 +21,7 @@ if ( ofs.find { it.name == ORGANIZATION } ) {
     return
 }
 
-log.info "Apply Github org folder ${ORGANIZATION}"
+println "Apply Github org folder ${ORGANIZATION}"
 
 def nav = new GitHubSCMNavigator(API_URL, ORGANIZATION, CREDENTIALS_ID, SCAN_CREDS_ID)
 def gh = Jenkins.get().createProject(OrganizationFolder, ORGANIZATION)
