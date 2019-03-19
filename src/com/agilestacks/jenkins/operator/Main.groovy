@@ -6,8 +6,10 @@ import com.agilestacks.jenkins.operator.kubernetes.RateLimiter
 import com.agilestacks.jenkins.operator.resources.Credentials
 import com.agilestacks.jenkins.operator.resources.EnvVars
 import com.agilestacks.jenkins.operator.resources.GithubOrganization
+import com.agilestacks.jenkins.operator.resources.GithubServer
 import com.agilestacks.jenkins.operator.resources.Pipeline
 import com.agilestacks.jenkins.operator.resources.PipelineLibrary
+import com.agilestacks.jenkins.operator.resources.Slack
 import groovy.util.logging.Slf4j
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
 
@@ -123,15 +125,15 @@ class Main {
         controller.apply(Credentials)
         controller.watch(Credentials)
 
-//        controller.apply(GithubServer)
-//        controller.watch(GithubServer)
+        controller.apply(GithubServer)
+        controller.watch(GithubServer)
 
 //        controller.apply(Plugin)
 //        controller.watch(Plugin)
 
 
-//        controller.apply(Slack)
-//        controller.watch(Slack)
+        controller.apply(Slack)
+        controller.watch(Slack)
 
 //        controller.apply(Kubernetes)
 //        controller.watch(Kubernetes)
