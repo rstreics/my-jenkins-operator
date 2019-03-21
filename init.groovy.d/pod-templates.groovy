@@ -109,7 +109,7 @@ pod1.annotations = [
 ]
 pod1.volumes = [
   // new EmptyDirVolume('/home/jenkins', false),
-  new PersistentVolumeClaim('/home/jenkins/workspace', 'workspace-volume', false),
+  // new PersistentVolumeClaim('/home/jenkins/workspace', 'workspace-volume', false),
 ]
 pod1.containers  = [ jnlp ]
 
@@ -121,7 +121,7 @@ pod2.inheritFrom = pod1.name
 pod2.containers  = [ toolbox ]
 pod2.volumes     = [
   // new EmptyDirVolume('/home/jenkins', false),
-  new PersistentVolumeClaim('/home/jenkins/workspace', 'workspace-volume', false),
+  // new PersistentVolumeClaim('/home/jenkins/workspace', 'workspace-volume', false),
   new HostPathVolume("/var/run/docker.sock", "/var/run/docker.sock"),
   new EmptyDirVolume('/var/lib/docker', false),
 ]
