@@ -10,6 +10,7 @@ import com.agilestacks.jenkins.operator.resources.GithubServer
 import com.agilestacks.jenkins.operator.resources.Pipeline
 import com.agilestacks.jenkins.operator.resources.PipelineLibrary
 import com.agilestacks.jenkins.operator.resources.Slack
+import com.sun.net.httpserver.HttpServer
 import groovy.util.logging.Slf4j
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
 
@@ -17,6 +18,7 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient
 class Main {
     static final DEFAULT_NAMESPACE = 'jenkins'
     static final MAX_RETRY = 60
+    static boolean ready = false
 
     static def fromNamespaceFile(File file = new File('/run/secrets/kubernetes.io/serviceaccount/namespace')) {
         return file.exists() ? file.text.trim() : null
@@ -40,6 +42,20 @@ class Main {
         return null
     }
 
+    static def startReadinessProbeEndpoint() {
+        HttpServer.create(new InetSocketAddress(8000), 0).with {
+            it.createContext("/status", { http ->
+                http.responseHeaders.add("Content-type", "application/json; charset=utf-8")
+                http.sendResponseHeaders(ready ? 200 : 500, 0)
+                http.responseBody.withWriter { out ->
+                    out << "{\"ready\":${ready}}"
+                }
+                http.requestBody.close()
+            })
+            it.start()
+        }
+    }
+
     static void main(String[] args) {
         def cli = new CliBuilder(usage: 'ls')
         cli.help('print this message')
@@ -51,8 +67,8 @@ class Main {
 
         def options = cli.parse(args)
 
-        String jenkinsUrl = options.jenkinsUrl  \
-                         ?: System.getenv('JENKINS_URL')
+        String jenkinsUrl = options.jenkinsUrl \
+                            ?: System.getenv('JENKINS_URL')
 
         if (!jenkinsUrl && System.getenv('JENKINS_SERVICE_HOST')) {
             def host = System.getenv('JENKINS_SERVICE_HOST')
@@ -72,10 +88,10 @@ class Main {
                                     ?: kubernetesClientFromEnv() \
                                     ?: new DefaultKubernetesClient()
 
-        def namespace = options.namespace  \
-                         ?: System.getenv('NAMESPACE')  \
-                         ?: fromNamespaceFile()  \
-                         ?: DEFAULT_NAMESPACE
+        def namespace = options.namespace \
+                        ?: System.getenv('NAMESPACE') \
+                        ?: fromNamespaceFile() \
+                        ?: DEFAULT_NAMESPACE
 
         if (namespace) {
             kubernetesClient = kubernetesClient.inNamespace(namespace) as DefaultKubernetesClient
@@ -84,10 +100,12 @@ class Main {
         def rateLimiter = new RateLimiter()
         def jenkinsClient = new JenkinsHttpClient(jenkinsUrl, jenkinsUsername, jenkinsPassword)
         def controller = new KubernetesResourceController(
-                kubernetes: kubernetesClient,
-                queue: rateLimiter,
-                jenkins: jenkinsClient
-            )
+            kubernetes: kubernetesClient,
+            queue: rateLimiter,
+            jenkins: jenkinsClient
+        )
+
+        startReadinessProbeEndpoint()
 
         for (i in 0..MAX_RETRY) {
             log.info "Connecting to Jenkins: ${jenkinsUrl}"
@@ -95,7 +113,7 @@ class Main {
                 def version = jenkinsClient.ping()
                 log.info "Connected to Jenkins v${version}"
                 break
-            } catch (ConnectException err) {
+            } catch (SocketTimeoutException | ConnectException err) {
                 if (i == MAX_RETRY) {
                     throw err
                 }
@@ -138,6 +156,7 @@ class Main {
 //        controller.apply(Kubernetes)
 //        controller.watch(Kubernetes)
 
-        log.info'Started'
+        ready = true
+        log.info 'Operator started'
     }
 }
