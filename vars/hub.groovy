@@ -72,12 +72,12 @@ def render(String template, Map additional=[:]) {
     render([template: template, additional: additional])
 }
 
-def kubeconfig(String caCert, String clientCert, String clientKey, 
+def kubeconfig(String caCert, String clientCert, String clientKey,
     String apiEndpoint, String domain){
     kubeconfig([
-        caCert: caCert, 
-        clientCert: clientCert, 
-        clientKey: clientKey, 
+        caCert: caCert,
+        clientCert: clientCert,
+        clientKey: clientKey,
         apiEndpoint: apiEndpoint,
         domain: domain
         ])
@@ -92,9 +92,9 @@ def kubeconfig(Map args=[:]) {
         state: getParamOrEnvvarValue('PLATFORM_STATE_FILE') ?: 'hub.yaml.state'
     ] << args
 
-    if (argv.caCert && argv.clientCert && argv.clientKey 
+    if (argv.caCert && argv.clientCert && argv.clientKey
         && argv.apiEndpoint && argv.domain) {
-        sh(returnStatus: false, 
+        sh(returnStatus: false,
             script: "#!/bin/sh -e\n echo \"${argv.caCert}\" > caCert.pom; echo \"${argv.clientCert}\" > clientCert.pom; "+
                 "echo \"${argv.clientKey}\" > clientKey.pom")
         sh(returnStatus: false,
@@ -119,6 +119,9 @@ def kubeconfig(Map args=[:]) {
         }
     } else {
         def command = "hub kubeconfig ${argv.state}"
+        if (argv.switchContext) {
+            command += " -k"
+        }
         final result = sh returnStatus: true, script: command
         if (result != 0) {
             error "hub kubeconfig finished with error [code: ${result}]"
