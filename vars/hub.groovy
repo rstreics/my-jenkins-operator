@@ -134,8 +134,13 @@ def render(Map args=[:]) {
         state: getParamOrEnvvarValue('STATE_FILE') ?: 'hub.yaml.state',
     ] << args
 
-    if (!argv.template || !fileExists(argv.template)) {
-        error "Cannot find template file: ${argv.template}"
+    if (!argv.template) {
+        error "Template/s globs/paths are not defined: ${argv.template}"
+    }
+
+    def files = findFiles(glob: argv.template)
+    if (files.length <= 0) {
+        error "Can not find templates globs/paths: ${argv.template}"
     }
 
     def command = "hub render ${argv.template} -s ${argv.state}"
