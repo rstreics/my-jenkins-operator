@@ -19,7 +19,8 @@ final MANAGE_HOOKS   = '{{spec.manageHooks}}' ?: null
 def github = GitHubPlugin.configuration()
 
 if ( github.configs.find { it.name == NAME } ) {
-    println 'GitHub ${NAME} already registered! Moving on'
+    println "GitHub ${NAME} already registered! Moving on"
+    println 'Status: CONVERGED <EOF>'
     return
 }
 

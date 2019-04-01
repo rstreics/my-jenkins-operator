@@ -25,6 +25,8 @@ spec:
           - baseUrl
           - botUser
           - buildServerUrl
+          - room
+          - sendAs
           - teamDomain
           - credentialsId
           properties:

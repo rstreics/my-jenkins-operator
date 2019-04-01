@@ -12,6 +12,8 @@ import com.agilestacks.jenkins.operator.resources.PipelineLibrary
 import com.agilestacks.jenkins.operator.resources.Slack
 import com.sun.net.httpserver.HttpServer
 import groovy.util.logging.Slf4j
+import io.fabric8.kubernetes.client.Config
+import io.fabric8.kubernetes.client.CustomResource
 import io.fabric8.kubernetes.client.DefaultKubernetesClient
 
 @Slf4j
@@ -57,6 +59,11 @@ class Main {
     }
 
     static void main(String[] args) {
+        def customResources = [
+            Credentials, EnvVars, GithubOrganization,
+            GithubServer, Pipeline, PipelineLibrary, Slack
+        ] as Class<CustomResource>[]
+
         def cli = new CliBuilder(usage: 'ls')
         cli.help('print this message')
         cli.ns(longOpt: 'namespace', valueSeparator: '=', args: 1, argName: 'namespace', 'Namespace for operator to watch')
@@ -84,9 +91,12 @@ class Main {
         String jenkinsUsername = options.jenkinsUsername ?: System.getenv('JENKINS_USERNAME')
         String jenkinsPassword = options.jenkinsPassword ?: System.getenv('JENKINS_PASSWORD')
 
+        def kubeconfig = Config.autoConfigure(null)
+        kubeconfig.setMaxConcurrentRequestsPerHost(customResources.length)
+
         def kubernetesClient = kubernetesClient(options.kurl) \
                                     ?: kubernetesClientFromEnv() \
-                                    ?: new DefaultKubernetesClient()
+                                    ?: new DefaultKubernetesClient(kubeconfig)
 
         def namespace = options.namespace \
                         ?: System.getenv('NAMESPACE') \
@@ -128,33 +138,10 @@ class Main {
 
         rateLimiter.startAtFixedRate()
 
-        controller.apply(Pipeline)
-        controller.watch(Pipeline)
-
-        controller.apply(PipelineLibrary)
-        controller.watch(PipelineLibrary)
-
-        controller.apply(GithubOrganization)
-        controller.watch(GithubOrganization)
-
-        controller.apply(EnvVars)
-        controller.watch(EnvVars)
-
-        controller.apply(Credentials)
-        controller.watch(Credentials)
-
-        controller.apply(GithubServer)
-        controller.watch(GithubServer)
-
-//        controller.apply(Plugin)
-//        controller.watch(Plugin)
-
-
-        controller.apply(Slack)
-        controller.watch(Slack)
-
-//        controller.apply(Kubernetes)
-//        controller.watch(Kubernetes)
+        customResources.each {it ->
+            controller.apply(it)
+            controller.watch(it)
+        }
 
         ready = true
         log.info 'Operator started'

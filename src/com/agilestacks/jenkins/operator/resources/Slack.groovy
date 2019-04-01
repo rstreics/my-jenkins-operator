@@ -9,4 +9,6 @@ class Slack extends CustomResource implements ScriptableResource {
     final Definition definition = fromClassPath('/slack/definition.yaml') as Definition
     final String createScript   = fromClassPath('/slack/create.groovy')
     final String deleteScript   = fromClassPath('/slack/delete.groovy')
+
+    final Map defaults = [:]
 }
