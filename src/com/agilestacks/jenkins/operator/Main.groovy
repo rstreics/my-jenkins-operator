@@ -60,8 +60,8 @@ class Main {
 
     static void main(String[] args) {
         def customResources = [
-            Credentials, EnvVars, GithubOrganization,
-            GithubServer, Pipeline, PipelineLibrary, Slack
+            Credentials, EnvVars, GithubOrganization, Pipeline, Slack,
+            GithubServer, PipelineLibrary
         ] as Class<CustomResource>[]
 
         def cli = new CliBuilder(usage: 'ls')
@@ -91,8 +91,10 @@ class Main {
         String jenkinsUsername = options.jenkinsUsername ?: System.getenv('JENKINS_USERNAME')
         String jenkinsPassword = options.jenkinsPassword ?: System.getenv('JENKINS_PASSWORD')
 
+        def maxConcurrentRequestsPerHost = System.getenv('MAX_CONCURRENT_REQS_PER_HOST')
+            ?: customResources.length.toString()
         def kubeconfig = Config.autoConfigure(null)
-        kubeconfig.setMaxConcurrentRequestsPerHost(customResources.length)
+        kubeconfig.setMaxConcurrentRequestsPerHost(maxConcurrentRequestsPerHost.toInteger())
 
         def kubernetesClient = kubernetesClient(options.kurl) \
                                     ?: kubernetesClientFromEnv() \
