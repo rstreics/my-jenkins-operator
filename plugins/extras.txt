@@ -3,3 +3,5 @@ credentials-binding:1.18
 embeddable-build-status:2.0
 pipeline-aws:1.36
 slack:2.18
+artifact-manager-s3:1.3
+aws-global-configuration
